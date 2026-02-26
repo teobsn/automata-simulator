@@ -1,0 +1,8 @@
+[final_state]
+q2
+
+[accepted]
+true
+
+[intermediary_steps]
+q0 q0 q1 q2

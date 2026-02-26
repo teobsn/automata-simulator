@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# This script runs the automaton simulator with the provided arguments.
+
+# Simply call the main Python script with all passed arguments
+python3 emu/main.py "$@"
