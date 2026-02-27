@@ -1,0 +1,35 @@
+[transitions]
+q1, a -> q2
+q1, b -> q3
+q1, c -> q3
+
+q2, a -> q2
+q2, b -> q2
+q2, c -> q1
+
+q3, a -> q3
+q3, b -> q3
+q3, c -> q4
+
+q4, a -> q4
+q4, b -> q4
+q4, c -> q2
+
+
+[alphabet]
+a
+b
+c
+d
+
+[initial_state]
+q1
+
+[accept_states]
+q4
+
+[states]
+q1
+q2
+q3
+q4

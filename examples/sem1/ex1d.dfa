@@ -1,0 +1,27 @@
+# L = {a^2n / n >= 1}
+
+[transitions]
+0, a -> 2
+0, b -> 3
+
+1, a -> 2
+1, b -> 3
+
+2, a -> 1
+2, b -> 3
+
+[alphabet]
+a
+b
+
+[initial_state]
+1
+
+[accept_states]
+1
+
+[states]
+0
+1
+2
+3

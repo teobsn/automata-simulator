@@ -1,0 +1,23 @@
+# W contine doar a-uri
+
+[transitions]
+q1, a -> q1
+q1, b -> q2
+
+q2, a -> q2
+q2, b -> q2
+
+
+[alphabet]
+a
+b
+
+[initial_state]
+q1
+
+[accept_states]
+q1
+
+[states]
+q1
+q2

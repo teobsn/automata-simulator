@@ -4,11 +4,16 @@ current_state = None
 
 # Find next state from transitions map
 def next_state(state, symbol, transitions):
-    return transitions[state][symbol]
+    if symbol in transitions:
+        if symbol in transitions[state]:
+            return transitions[state][symbol]
+    else:
+        return "Hang"
 
 def simulate(automaton, input_string, write_intermediary=False):
     # Initialize result data
     results = {}
+    hang = False
 
     # Initialize the current state to the start state
     current_state = automaton['initial_state']
@@ -20,11 +25,18 @@ def simulate(automaton, input_string, write_intermediary=False):
         
         # Update the current state based on the transitions
         current_state = next_state(current_state, symbol, automaton['transitions'])
+        if current_state == "Hang":
+            hang = True
+            break
+
         if write_intermediary:
             results["steps"] = results.get("steps", []) + [current_state]
 
     # Check if the final state is an accepting state
     results['final_state'] = current_state
-    results['accepted'] = current_state in automaton['accept_states']
-    
+    if not hang:
+        results['accepted'] = current_state in automaton['accept_states']
+    else:
+        results['accepted'] = 'Hang'
+
     return results

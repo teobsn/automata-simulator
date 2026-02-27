@@ -1,7 +1,9 @@
 
 def interpret_result(result):
-    output = f"[final_state]\n{result['final_state']}\n"
-    output += f"\n[accepted]\n{'true' if result['accepted'] else 'false'}\n"
+    output = f"[final_state]\n"
+    output += f"{result['final_state']}\n"
+    output += f"\n[accepted]\n"
+    output += f"{result['accepted'] is True}\n"
     
     if "steps" in result:
         output += "\n[intermediary_steps]\n"
