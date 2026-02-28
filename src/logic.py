@@ -4,7 +4,7 @@ current_state = None
 
 # Find next state from transitions map
 def next_state(state, symbol, transitions):
-    if symbol in transitions:
+    if state in transitions:
         if symbol in transitions[state]:
             return transitions[state][symbol]
     else:
