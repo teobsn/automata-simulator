@@ -7,7 +7,9 @@ def next_state(state, symbol, transitions):
     if state in transitions:
         if symbol in transitions[state]:
             return transitions[state][symbol]
+        print(f"State '{state}' not in symbol '{symbol}' transition list.")
     else:
+        print(f"state '{state}' not in transitions list.")
         return "Hang"
 
 def simulate(automaton, input_string, write_intermediary=False):

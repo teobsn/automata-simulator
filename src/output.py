@@ -11,10 +11,11 @@ def interpret_result(result):
 
     return output
 
-def write_output(string, output_file):
+def write_output(string, output_file, append=False):
     if output_file is None:
         print(string)
     else:
-        with open(output_file, 'w') as f:
+        mode = 'a' if append else 'w'
+        with open(output_file, mode) as f:
             f.write(string + '\n')
             
