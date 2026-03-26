@@ -1,0 +1,19 @@
+[alphabet]
+a b
+
+[states]
+s0 s1 s2 s3 s4 s5 sf
+
+[initial_state]
+s0
+
+[accept_states]
+sf
+
+[transitions]
+s0, a -> s1, s2, s3, s4, s5
+s1, b -> sf
+s2, b -> s2
+s3, b -> s3
+s4, b -> s4
+s5, b -> s5

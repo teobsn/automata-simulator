@@ -2,16 +2,26 @@
 
 
 # Standard libraries
-import os
-from pprint import pprint
+# import os
+# from pprint import pprint
 import sys
 
 # Project modules
 import parser
+
+# DFA
 import dfa_process
 import dfa_logic
+import dfa_output
+
+# NFA
+import nfa_process
+import nfa_logic
+import nfa_output
+
 import output
 import cli
+
 
 def main():
     # Parse command-line arguments
@@ -20,25 +30,60 @@ def main():
     # Parse the file to get the automaton data
     parsed_data = parser.parse(args.automaton_data)
 
-    # Simulate the automaton with the input string
-    if args.automaton_type in ['DFA', 'dfa']:
+    if args.automaton_type in ["DFA", "dfa"]:
+        # Process the parsed file into proper data
         output_data = dfa_process.process_data(parsed_data)
 
         if not args.input_list_file:
-            result = dfa_logic.simulate(output_data, args.input_string, args.write_intermediary)
+        # Simulate the automaton with the input string
+            result = dfa_logic.simulate(
+                output_data, args.input_string, write_intermediary=args.write_intermediary
+            )
 
             # Write the result to the output file or print it
-            output.write_output(output.interpret_result(result), args.output_file)
+            output.write_output(dfa_output.interpret_result(result), args.output_file)
         else:
-            with open(args.input_list_file, 'r') as f:
+            with open(args.input_list_file, "r") as f:
+                input_list = f.read().splitlines()
+
+            # Create a blank file first, as we are going to append to it 
+            output.blank_file(args.output_file)
+
+            for input_str in input_list:
+                result = dfa_logic.simulate(
+                    output_data, input_str, write_intermediary=args.write_intermediary, show_input=True
+                )
+
+                output.write_output(
+                    dfa_output.interpret_result(result), args.output_file, append=True
+                )
+    elif args.automaton_type in ["NFA", "nfa"]:
+        output_data = nfa_process.process_data(parsed_data)
+
+        if not args.input_list_file:
+            result = nfa_logic.simulate(
+                output_data, args.input_string, write_intermediary=args.write_intermediary
+            )
+
+            # Write the result to the output file or print it
+            output.write_output(nfa_output.interpret_result(result), args.output_file)
+        else:
+            with open(args.input_list_file, "r") as f:
                 input_list = f.read().splitlines()
 
             for input_str in input_list:
-                result = dfa_logic.simulate(output_data, input_str, args.write_intermediary)
-                output.write_output(output.interpret_result(result), args.output_file, append=True)
+                result = nfa_logic.simmulate(
+                    output_data, input_str, write_intermediary=args.write_intermediary, show_input=True
+                )
+                output.write_output(
+                    nfa_output.interpret_result(result), args.output_file, append=True
+                )
     else:
-        raise ValueError(f"Automaton type '{args.automaton_type}' is not supported. Currently only 'DFA' is supported.")
+        raise ValueError(
+            f"Automaton type '{args.automaton_type}' is not supported. Currently only 'DFA' and 'NFA' are supported."
+        )
 
 
 if __name__ == "__main__":
     main()
+

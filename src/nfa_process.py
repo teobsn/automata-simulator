@@ -18,29 +18,46 @@ def section_initialize(data, section_name):
         raise ValueError(f"Parser: Unknown section '{section_name}' in input file.")
 
 
-def transition_add(data, source_state, input_symbol, next_state):
+def transition_add(data, source_state, input_symbols, next_states):
     if source_state not in data["transitions"]:
         data["transitions"][source_state] = {}
 
-    data["transitions"][source_state][input_symbol] = next_state
+    for input_symbol in input_symbols:
+        data["transitions"][source_state][input_symbol] = data["transitions"][source_state].get(input_symbol, []) + next_states
 
 
 def transition_process_line(line):
-    # Format is expected to be: current_state, input_symbol -> next_state
-    for sep in ["->", ","]:
+    # Format is expected to be one of: 
+    # current_state, input_symbol -> next_state
+    # current_state, (input_symbol1, input_symbol2, ...) -> next_state
+    # current_state, ipnut_symbol -> next_states
+
+    for sep in ["->"]:
         if sep not in line:
             raise ValueError(f"Parser: Invalid transition format in line: '{line}'")
 
     # Split the line into components
-    combo, next_state = line.split("->")
-    source_state, input_symbol = combo.split(",")
+    combo, next_states_text = line.split("->")
+
+    split_combo = combo.split(",", 1)
+    source_state = split_combo[0]
+    input_symbols_text = split_combo[1]
 
     # Strip whitespace from components
     source_state = source_state.strip()
-    input_symbol = input_symbol.strip()
-    next_state = next_state.strip()
+    input_symbols_text = input_symbols_text.strip()
+    next_states_text = next_states_text.strip()
 
-    return source_state, input_symbol, next_state
+    # Process input symbols
+    if input_symbols_text.startswith("(") and input_symbols_text.endswith(")"):
+        input_symbols = [s.strip() for s in input_symbols_text[1:-1].split(",")]
+    else:
+        input_symbols = [input_symbols_text]
+
+    # Process next states
+    next_states = [s.strip() for s in next_states_text.split(",")]
+
+    return source_state, input_symbols, next_states
 
 
 def process_data(input_data):
@@ -59,7 +76,7 @@ def process_data(input_data):
     for section in required_sections:
         if section not in section_list:
             raise ValueError(
-                f"DFA Processor: Missing required section '{section}' in input file."
+                f"NFA Processor: Missing required section '{section}' in input file."
             )
 
     # Process each section in input data
@@ -76,17 +93,17 @@ def process_data(input_data):
     for line in parser.get_section_from_data(input_data, "initial_state"):
         if "initial_state" in output_data and output_data["initial_state"]:
             raise ValueError(
-                "DFA Processor: Multiple initial states found in input file."
+                "NFA Processor: Multiple initial states found in input file."
             )
         output_data["initial_state"] = line
 
     # Transitions section can only have one entry per line
     for line in parser.get_section_from_data(input_data, "transitions"):
         # Format line and extract components
-        source_state, input_symbol, next_state = transition_process_line(line)
+        source_state, input_symbols, next_states = transition_process_line(line)
 
         # Add transition to data dictionary
-        transition_add(output_data, source_state, input_symbol, next_state)
+        transition_add(output_data, source_state, input_symbols, next_states)
 
     return output_data
 

@@ -1,24 +1,29 @@
-
-# Remember current state
-current_state = None
-
 # Find next state from transitions map
 def next_state(state, symbol, transitions):
     if state in transitions:
         if symbol in transitions[state]:
             return transitions[state][symbol]
-        print(f"State '{state}' not in symbol '{symbol}' transition list.")
+        print(f"Symbol '{symbol}' not in '{state}' transition list.")
+        return "Hang"
     else:
-        print(f"state '{state}' not in transitions list.")
+        print(f"State '{state}' not in transitions list.")
         return "Hang"
 
-def simulate(automaton, input_string, write_intermediary=False):
+def simulate(automaton, input_string, write_intermediary=False, show_input=False):
     # Initialize result data
     results = {}
     hang = False
 
     # Initialize the current state to the start state
     current_state = automaton['initial_state']
+
+    # Add the input string to the result 
+    if show_input:
+        results['input_string'] = input_string
+
+    # Initialize the steps list if we want to write intermediary steps
+    if write_intermediary:
+        results["steps"] = [current_state]
 
     # Process each symbol in the input string
     for symbol in input_string:
@@ -31,8 +36,9 @@ def simulate(automaton, input_string, write_intermediary=False):
             hang = True
             break
 
+        # If we want to write intermediary steps, we add the current_state to the "steps" list
         if write_intermediary:
-            results["steps"] = results.get("steps", []) + [current_state]
+            results["steps"].append(current_state)
 
     # Check if the final state is an accepting state
     results['final_state'] = current_state
