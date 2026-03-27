@@ -58,14 +58,27 @@ The \texttt{[alphabet]} section defines the set of symbols accepted by the autom
 \subsection{States}
 The \texttt{[states]} section lists all possible states in the automaton. Like the alphabet, states are space-separated.
 
+\subsubsection{State Ranges}
+To define a sequence of states with a common prefix and a numerical range, you can use the range syntax: \texttt{prefix[start-end]}.
+\begin{lstlisting}
+q[0-15] # Expands to q0 q1 q2 ... q15
+\end{lstlisting}
+
 \subsection{Initial State}
 The \texttt{[initial\_state]} section must contain exactly one state from the defined states list. This represents the starting point of the simulation.
 
 \subsection{Accept States}
-The \texttt{[accept\_states]} section lists the states that lead to an "Accepted" result if the simulation ends in one of them.
+The \texttt{[accept\_states]} section lists the states that lead to an "Accepted" result if the simulation ends in one of them. State ranges are also supported here.
 
 \subsection{Transitions}
 The \texttt{[transitions]} section defines the state transition function.
+
+\subsubsection{Wildcards}
+The asterisk \texttt{*} can be used as a wildcard for input symbols, representing all symbols in the defined alphabet.
+\begin{lstlisting}
+q0, * -> q1 # Transition to q1 on any symbol from the alphabet
+\end{lstlisting}
+In DFAs, a specific transition defined for a symbol will take precedence over a wildcard transition if it appears later in the file.
 
 \section{Transition Syntax}
 
@@ -93,6 +106,11 @@ q0, a -> q1, q2
 q0, (a, b) -> q1
 \end{lstlisting}
 
+\textbf{Wildcard Transition:}
+\begin{lstlisting}
+q0, * -> q1
+\end{lstlisting}
+
 \section{Lexical Rules}
 \begin{itemize}
     \item \textbf{Comments:} Any text following a \texttt{\#} symbol on a line is ignored.
@@ -118,6 +136,25 @@ s1
 s0, a -> s1
 s1, b -> s1
 s1, a -> s0
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash, caption=Example NFA file with ranges and wildcards]
+[alphabet]
+0 1
+
+[states]
+q[0-2]
+
+[initial_state]
+q0
+
+[accept_states]
+q2
+
+[transitions]
+q0, * -> q0
+q0, 1 -> q1
+q1, (0, 1) -> q2
 \end{lstlisting}
 
 \end{document}

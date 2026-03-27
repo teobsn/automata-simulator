@@ -1,0 +1,15 @@
+[alphabet]
+a b c
+
+[states]
+q0 q1
+
+[initial_state]
+q0
+
+[accept_states]
+q1
+
+[transitions]
+q0, * -> q1
+q0, b -> q0

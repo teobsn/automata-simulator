@@ -1,4 +1,5 @@
 import parser
+import re
 
 
 def section_initialize(data, section_name):
@@ -22,7 +23,11 @@ def transition_add(data, source_state, input_symbol, next_state):
     if source_state not in data["transitions"]:
         data["transitions"][source_state] = {}
 
-    data["transitions"][source_state][input_symbol] = next_state
+    if input_symbol == "*":
+        for sym in data["alphabet"]:
+            data["transitions"][source_state][sym] = next_state
+    else:
+        data["transitions"][source_state][input_symbol] = next_state
 
 
 def transition_process_line(line):
@@ -43,7 +48,22 @@ def transition_process_line(line):
     return source_state, input_symbol, next_state
 
 
+def expand_range(token):
+    # Example: q[0-15] -> q0, q1, ..., q15
+    match = re.match(r"(.*)\[(\d+)-(\d+)\]", token)
+    if match:
+        prefix = match.group(1)
+        start = int(match.group(2))
+        end = int(match.group(3))
+        return [f"{prefix}{i}" for i in range(start, end + 1)]
+    return [token]
+
+
 def process_data(input_data):
+    """
+    Processes the raw parsed data from the input file into a structured dictionary
+    suitable for DFA simulation.
+    """
     # Data dictionary
     output_data = {}
 
@@ -63,14 +83,23 @@ def process_data(input_data):
             )
 
     # Process each section in input data
+    # Initialize each section in the output dictionary based on its expected type
     for section in parser.get_section_list(input_data):
-        # Initialize section in data dictionary
         section_initialize(output_data, section)
 
-    # Alphabet and states sections can have multiple entries, so we split the data line into tokens and extend the list
-    for section in ["alphabet", "states", "accept_states"]:
+    # Alphabet
+    # Split space-separated symbols from each line and add to list
+    for line in parser.get_section_from_data(input_data, "alphabet"):
+        output_data["alphabet"].extend(line.split())
+
+    # States and accept_states
+    # Supports both literal state names and range syntax (e.g., q[0-15]).
+    for section in ["states", "accept_states"]:
         for line in parser.get_section_from_data(input_data, section):
-            output_data[section].extend(line.split())
+            tokens = line.split()
+            for token in tokens:
+                # Range syntax is expanded into individual state names using expand_range().
+                output_data[section].extend(expand_range(token))
 
     # Initial state section should only have one entry, so we check if it is already set.
     for line in parser.get_section_from_data(input_data, "initial_state"):
@@ -81,6 +110,9 @@ def process_data(input_data):
         output_data["initial_state"] = line
 
     # Transitions section can only have one entry per line
+    # Each line is parsed to extract (source_state, symbol, next_state).
+    # Supports '*' as a wildcard for the symbol, which creates transitions for 
+    # all symbols in the alphabet.
     for line in parser.get_section_from_data(input_data, "transitions"):
         # Format line and extract components
         source_state, input_symbol, next_state = transition_process_line(line)
