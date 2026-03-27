@@ -3,15 +3,18 @@ def next_states(state, symbol, transitions):
     if state in transitions:
         if symbol in transitions[state]:
             return transitions[state][symbol]
-        print(f"Symbol '{symbol}' not in '{state}' transition list.")
         return "Hang"
     else:
-        print(f"State '{state}' not in transitions list.")
         return "Hang"
 
 def simulate(automaton, input_string, write_intermediary=False, show_input=False):
     # Initialize result data
     results = {}
+
+    # Check alphabet
+    for symbol in input_string:
+        if symbol not in automaton['alphabet']:
+            raise ValueError(f"Symbol '{symbol}' not in automaton alphabet.")
 
     # Add the input string to the result 
     if show_input:

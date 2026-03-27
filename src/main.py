@@ -47,7 +47,8 @@ def main():
                 input_list = f.read().splitlines()
 
             # Create a blank file first, as we are going to append to it 
-            output.blank_file(args.output_file)
+            if args.output_file is not None:
+                output.blank_file(args.output_file)
 
             for input_str in input_list:
                 result = dfa_logic.simulate(
@@ -71,8 +72,12 @@ def main():
             with open(args.input_list_file, "r") as f:
                 input_list = f.read().splitlines()
 
+            # Create a blank file first, as we are going to append to it 
+            if args.output_file is not None:
+                output.blank_file(args.output_file)
+
             for input_str in input_list:
-                result = nfa_logic.simmulate(
+                result = nfa_logic.simulate(
                     output_data, input_str, write_intermediary=args.write_intermediary, show_input=True
                 )
                 output.write_output(
