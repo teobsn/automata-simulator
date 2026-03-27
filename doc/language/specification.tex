@@ -1,0 +1,123 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\geometry{a4paper, margin=1in}
+
+\title{Automaton Specification Language Documentation}
+\author{Automaton Emulator}
+\date{}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstset{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegray},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The Automaton Specification Language (ASL) is a domain-specific language designed to define finite automata for simulation. It supports both Deterministic Finite Automata (DFA) and Non-deterministic Finite Automata (NFA).
+
+\section{File Structure}
+An ASL file is divided into mandatory sections, each denoted by a header in square brackets. Sections can appear in any order, though the following order is conventional:
+\begin{enumerate}
+    \item \texttt{[alphabet]}
+    \item \texttt{[states]}
+    \item \texttt{[initial\_state]}
+    \item \texttt{[accept\_states]}
+    \item \texttt{[transitions]}
+\end{enumerate}
+
+\section{Sections}
+
+\subsection{Alphabet}
+The \texttt{[alphabet]} section defines the set of symbols accepted by the automaton. Symbols are space-separated and can span multiple lines.
+
+\subsection{States}
+The \texttt{[states]} section lists all possible states in the automaton. Like the alphabet, states are space-separated.
+
+\subsection{Initial State}
+The \texttt{[initial\_state]} section must contain exactly one state from the defined states list. This represents the starting point of the simulation.
+
+\subsection{Accept States}
+The \texttt{[accept\_states]} section lists the states that lead to an "Accepted" result if the simulation ends in one of them.
+
+\subsection{Transitions}
+The \texttt{[transitions]} section defines the state transition function.
+
+\section{Transition Syntax}
+
+\subsection{DFA Transitions}
+For Deterministic Finite Automata, each transition must follow the strict format:
+\begin{lstlisting}
+source_state, symbol -> next_state
+\end{lstlisting}
+
+\subsection{NFA Transitions}
+Non-deterministic Finite Automata support additional syntax for flexibility:
+
+\textbf{Single Transition:}
+\begin{lstlisting}
+q0, a -> q1
+\end{lstlisting}
+
+\textbf{Multiple Next States:}
+\begin{lstlisting}
+q0, a -> q1, q2
+\end{lstlisting}
+
+\textbf{Multiple Input Symbols:}
+\begin{lstlisting}
+q0, (a, b) -> q1
+\end{lstlisting}
+
+\section{Lexical Rules}
+\begin{itemize}
+    \item \textbf{Comments:} Any text following a \texttt{\#} symbol on a line is ignored.
+    \item \textbf{Whitespace:} Leading and trailing whitespace on lines is ignored. Empty lines are ignored.
+    \item \textbf{Case Sensitivity:} Section headers are case-insensitive (\texttt{[ALPHABET]} is the same as \texttt{[alphabet]}).
+\end{itemize}
+
+\section{Example}
+\begin{lstlisting}[language=bash, caption=Example DFA file]
+[alphabet]
+a b
+
+[states]
+s0 s1
+
+[initial_state]
+s0
+
+[accept_states]
+s1
+
+[transitions]
+s0, a -> s1
+s1, b -> s1
+s1, a -> s0
+\end{lstlisting}
+
+\end{document}
