@@ -15,6 +15,8 @@ def section_initialize(data, section_name):
         data[section_name] = {}
     elif section_name == "initial_state":
         data[section_name] = None
+    elif section_name == "settings":
+        data[section_name] = []
     else:
         raise ValueError(f"Parser: Unknown section '{section_name}' in input file.")
 
@@ -119,6 +121,13 @@ def process_data(input_data):
 
         # Add transition to data dictionary
         transition_add(output_data, source_state, input_symbol, next_state)
+
+    # Settings section
+    if "settings" in input_data:
+        for line in parser.get_section_from_data(input_data, "settings"):
+            output_data["settings"].extend(line.split())
+    else:
+        output_data["settings"] = []
 
     return output_data
 

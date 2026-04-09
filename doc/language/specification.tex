@@ -41,13 +41,14 @@
 The Automaton Specification Language (ASL) is a domain-specific language designed to define finite automata for simulation. It supports both Deterministic Finite Automata (DFA) and Non-deterministic Finite Automata (NFA).
 
 \section{File Structure}
-An ASL file is divided into mandatory sections, each denoted by a header in square brackets. Sections can appear in any order, though the following order is conventional:
+An ASL file is divided into sections, each denoted by a header in square brackets. Sections can appear in any order, though the following order is conventional:
 \begin{enumerate}
     \item \texttt{[alphabet]}
     \item \texttt{[states]}
     \item \texttt{[initial\_state]}
     \item \texttt{[accept\_states]}
     \item \texttt{[transitions]}
+    \item \texttt{[settings]} (optional)
 \end{enumerate}
 
 \section{Sections}
@@ -79,6 +80,12 @@ The asterisk \texttt{*} can be used as a wildcard for input symbols, representin
 q0, * -> q1 # Transition to q1 on any symbol from the alphabet
 \end{lstlisting}
 In DFAs, a specific transition defined for a symbol will take precedence over a wildcard transition if it appears later in the file.
+
+\subsection{Settings}
+The \texttt{[settings]} section allows for optional behavioral modifications of the automaton. Settings are listed line-by-line or space-separated.
+
+\subsubsection{RemainInCurrentStateOnUndefinedTransition}
+When this setting is enabled, the automaton will not "Hang" if it encounters a symbol for which no transition is defined for the current state. Instead, it will remain in its current state and continue processing the rest of the input string. This is particularly useful for building text-based games or parsers where some inputs should simply be ignored or keep the state unchanged.
 
 \section{Transition Syntax}
 

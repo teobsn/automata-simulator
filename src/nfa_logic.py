@@ -1,11 +1,13 @@
 # Find next state from transitions map
-def next_states(state, symbol, transitions):
+def next_states(state, symbol, transitions, settings=[]):
     if state in transitions:
         if symbol in transitions[state]:
             return transitions[state][symbol]
-        return "Hang"
-    else:
-        return "Hang"
+
+    if "RemainInCurrentStateOnUndefinedTransition" in settings:
+        return [state]
+
+    return "Hang"
 
 def simulate(automaton, input_string, write_intermediary=False, show_input=False):
     # Initialize result data
@@ -44,7 +46,7 @@ def simulate_next(automaton, state, input_string, index, write_intermediary):
         return state in automaton['accept_states']
 
     symbol = input_string[index]
-    next_state_list = next_states(state, symbol, automaton['transitions'])
+    next_state_list = next_states(state, symbol, automaton['transitions'], automaton.get('settings', []))
 
     # Transmit hang
     if next_state_list == "Hang":
@@ -70,7 +72,7 @@ def simulate_next(automaton, state, input_string, index, write_intermediary):
 def simulate_next_sequential(automaton, state, input_string, index, write_intermediary):
     symbol = input_string[index]
 
-    next_state_list = next_states(state, symbol, automaton['transitions'])
+    next_state_list = next_states(state, symbol, automaton['transitions'], automaton.get('settings', []))
 
     # Transmit hang
     if next_state_list == "Hang":

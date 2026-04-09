@@ -1,11 +1,13 @@
 # Find next state from transitions map
-def next_state(state, symbol, transitions):
+def next_state(state, symbol, transitions, settings=[]):
     if state in transitions:
         if symbol in transitions[state]:
             return transitions[state][symbol]
-        return "Hang"
-    else:
-        return "Hang"
+
+    if "RemainInCurrentStateOnUndefinedTransition" in settings:
+        return state
+
+    return "Hang"
 
 def simulate(automaton, input_string, write_intermediary=False, show_input=False):
     # Initialize result data
@@ -27,9 +29,9 @@ def simulate(automaton, input_string, write_intermediary=False, show_input=False
     for symbol in input_string:
         if symbol not in automaton['alphabet']:
             raise ValueError(f"Symbol '{symbol}' not in automaton alphabet.")
-        
+
         # Update the current state based on the transitions
-        current_state = next_state(current_state, symbol, automaton['transitions'])
+        current_state = next_state(current_state, symbol, automaton['transitions'], automaton.get('settings', []))
         if current_state == "Hang":
             hang = True
             break
