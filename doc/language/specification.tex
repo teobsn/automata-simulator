@@ -69,7 +69,7 @@ q[0-15] # Expands to q0 q1 q2 ... q15
 The \texttt{[initial\_state]} section must contain exactly one state from the defined states list. This represents the starting point of the simulation.
 
 \subsection{Accept States}
-The \texttt{[accept\_states]} section lists the states that lead to an "Accepted" result if the simulation ends in one of them. State ranges are also supported here.
+The \texttt{[accept\_states]} section lists the states that lead to an 'Accepted' result if the simulation ends in one of them. State ranges are also supported here.
 
 \subsection{Transitions}
 The \texttt{[transitions]} section defines the state transition function.
@@ -85,7 +85,7 @@ In DFAs, a specific transition defined for a symbol will take precedence over a 
 The \texttt{[settings]} section allows for optional behavioral modifications of the automaton. Settings are listed line-by-line or space-separated.
 
 \subsubsection{RemainInCurrentStateOnUndefinedTransition}
-When this setting is enabled, the automaton will not "Hang" if it encounters a symbol for which no transition is defined for the current state. Instead, it will remain in its current state and continue processing the rest of the input string. This is particularly useful for building text-based games or parsers where some inputs should simply be ignored or keep the state unchanged.
+When this setting is enabled, the automaton will not 'Hang' if it encounters a symbol for which no transition is defined for the current state. Instead, it will remain in its current state and continue processing the rest of the input string. This is particularly useful for building text-based games or parsers where some inputs should simply be ignored or keep the state unchanged.
 
 \section{Transition Syntax}
 
