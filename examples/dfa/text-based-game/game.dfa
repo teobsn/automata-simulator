@@ -1,0 +1,30 @@
+[alphabet]
+N S E W
+
+[states]
+Entrance
+Kitchen
+Hallway
+Library
+DiningRoom
+Garden
+Hell
+Heaven
+
+[initial_state]
+Entrance
+
+[accept_states]
+Heaven
+
+[transitions]
+Entrance, W -> Hallway
+Garden, N -> Heaven
+Garden, S -> Hell
+Hallway, W -> Library
+Hallway, N -> Kitchen
+Kitchen, W -> DiningRoom
+DiningRoom, W -> Garden
+
+[settings]
+RemainInCurrentStateOnUndefinedTransition
