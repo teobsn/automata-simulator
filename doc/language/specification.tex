@@ -3,6 +3,7 @@
 \usepackage{geometry}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
 
 \geometry{a4paper, margin=1in}
 
@@ -36,10 +37,13 @@
 \begin{document}
 
 \maketitle
+\tableofcontents
+\clearpage
 
 \section{Introduction}
 The Automaton Specification Language (ASL) is a domain-specific language designed to define finite automata for simulation. It supports both Deterministic Finite Automata (DFA) and Non-deterministic Finite Automata (NFA).
 
+\clearpage
 \section{File Structure}
 An ASL file is divided into sections, each denoted by a header in square brackets. Sections can appear in any order, though the following order is conventional:
 \begin{enumerate}
@@ -51,6 +55,7 @@ An ASL file is divided into sections, each denoted by a header in square bracket
     \item \texttt{[settings]} (optional)
 \end{enumerate}
 
+\clearpage
 \section{Sections}
 
 \subsection{Alphabet}
@@ -87,6 +92,7 @@ The \texttt{[settings]} section allows for optional behavioral modifications of 
 \subsubsection{RemainInCurrentStateOnUndefinedTransition}
 When this setting is enabled, the automaton will not 'Hang' if it encounters a symbol for which no transition is defined for the current state. Instead, it will remain in its current state and continue processing the rest of the input string. This is particularly useful for building text-based games or parsers where some inputs should simply be ignored or keep the state unchanged.
 
+\clearpage
 \section{Transition Syntax}
 
 \subsection{DFA Transitions}
@@ -118,6 +124,7 @@ q0, (a, b) -> q1
 q0, * -> q1
 \end{lstlisting}
 
+\clearpage
 \section{Lexical Rules}
 \begin{itemize}
     \item \textbf{Comments:} Any text following a \texttt{\#} symbol on a line is ignored.
@@ -125,6 +132,7 @@ q0, * -> q1
     \item \textbf{Case Sensitivity:} Section headers are case-insensitive (\texttt{[ALPHABET]} is the same as \texttt{[alphabet]}).
 \end{itemize}
 
+\clearpage
 \section{Example}
 \begin{lstlisting}[language=bash, caption=Example DFA file]
 [alphabet]
