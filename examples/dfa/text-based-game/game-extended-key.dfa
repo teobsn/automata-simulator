@@ -1,0 +1,86 @@
+[alphabet]
+# North, South, East, West
+N S E W
+# Pickup/drop potion
+P D
+
+[states]
+# Universal states
+Entrance
+
+# No potion states
+Library
+Hallway
+Kitchen
+DiningRoom
+Garden
+
+# Key states
+Library_withKey
+Hallway_withKey
+Kitchen_withKey
+DiningRoom_withKey
+Garden_withKey
+
+# Potion states
+Library_withPotion
+Hallway_withPotion
+Kitchen_withPotion
+DiningRoom_withPotion
+Garden_withPotion
+
+# Final states
+Hell
+Heaven
+
+
+[initial_state]
+Entrance
+
+
+[accept_states]
+Heaven
+
+
+[transitions]
+# Entrance
+Entrance, W -> Hallway
+
+# No key/potion states
+Hallway, W -> Library
+Library, E -> Hallway
+Hallway, N -> Kitchen
+Kitchen, W -> DiningRoom
+Kitchen, S -> Hallway
+DiningRoom, W -> Garden
+Garden, S -> Hell
+
+# With Key states
+Hallway_withKey, W -> Library_withKey
+Library_withKey, E -> Hallway_withKey
+Hallway_withKey, N -> Kitchen_withKey
+Kitchen_withKey, W -> DiningRoom_withKey
+Kitchen_withKey, S -> Hallway_withKey
+DiningRoom_withKey, W -> Garden_withKey
+Garden_withKey, S -> Hell
+
+# With Potion states
+Hallway_withPotion, W -> Library_withPotion
+Library_withPotion, E -> Hallway_withPotion
+Hallway_withPotion, N -> Kitchen_withPotion
+Kitchen_withPotion, W -> DiningRoom_withPotion
+Kitchen_withPotion, S -> Hallway_withPotion
+DiningRoom_withPotion, W -> Garden_withPotion
+Garden_withPotion, S -> Heaven
+
+# Transition between key and no key variant
+Kitchen, P -> Kitchen_withKey
+Kitchen_withKey, D -> Kitchen
+
+# Transition between potion and no potion variant
+Library_withKey, P -> Library_withPotion
+Library_withPotion, D -> Library_withKey
+
+
+[settings]
+RemainInCurrentStateOnUndefinedTransition
