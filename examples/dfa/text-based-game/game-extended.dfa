@@ -1,0 +1,64 @@
+[alphabet]
+# North, South, East, West
+N S E W
+# Pickup/drop potion
+P D
+
+[states]
+# Universal states
+Entrance
+
+# No potion states
+Library
+Hallway
+Kitchen
+DiningRoom
+Garden
+
+# Potion states
+Library_withPotion
+Hallway_withPotion
+Kitchen_withPotion
+DiningRoom_withPotion
+Garden_withPotion
+
+# Final states
+Hell
+Heaven
+
+
+[initial_state]
+Entrance
+
+
+[accept_states]
+Heaven
+
+
+[transitions]
+# Entrance
+Entrance, W -> Hallway
+
+# No potion states
+Hallway, W -> Library
+Library, E -> Hallway
+Hallway, N -> Kitchen
+Kitchen, W -> DiningRoom
+DiningRoom, W -> Garden
+Garden, S -> Hell
+
+# Potion states
+Hallway_withPotion, W -> Library_withPotion
+Library_withPotion, E -> Hallway_withPotion
+Hallway_withPotion, N -> Kitchen_withPotion
+Kitchen_withPotion, W -> DiningRoom_withPotion
+DiningRoom_withPotion, W -> Garden_withPotion
+Garden_withPotion, S -> Heaven
+
+# Transition between potion and no potion variant; to-do: be able to drop potion anywhere
+Library, P -> Library_withPotion
+Library_withPotion, D -> Library
+
+
+[settings]
+RemainInCurrentStateOnUndefinedTransition
