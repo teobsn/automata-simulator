@@ -15,11 +15,12 @@ def parse_args(args):
     parser.add_argument('--output-file',        nargs='?', default=None,          help='Optional output file to write results to')
     parser.add_argument('--write-intermediary', action='store_true',              help='Write intermediary states to the output')
     parser.add_argument('--input-list-file',    type=check_path,                  help='Path to the file containing the list of inputs')
+    parser.add_argument('-i', '--interactive',  action='store_true',              help='Enable interactive mode for input symbols')
 
     parsed_args = parser.parse_args(args)
 
     # Universal (regardless of automaton type) argument checks
-    if parsed_args.input_string is None and parsed_args.input_list_file is None:
-        parser.error("At least one of 'input_string' or '--input-list-file' must be provided.")
+    if not parsed_args.interactive and parsed_args.input_string is None and parsed_args.input_list_file is None:
+        parser.error("At least one of 'input_string', '--input-list-file', or '--interactive' must be provided.")
 
     return parsed_args

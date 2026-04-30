@@ -48,3 +48,34 @@ def simulate(automaton, input_string, write_intermediary=False, show_input=False
         results['accepted'] = 'Hang'
 
     return results
+
+def simulate_interactive(automaton):
+    current_state = automaton['initial_state']
+    print(f"Initial state: {current_state}")
+
+    while True:
+        try:
+            symbol = input(f"Enter symbol: ").strip()
+            if not symbol:
+                continue
+
+            # Allow exiting with common keywords if they aren't part of the alphabet
+            if symbol.lower() in ["quit", "exit", "done"] and symbol not in automaton["alphabet"]:
+                break
+
+            if symbol not in automaton['alphabet']:
+                print(f"Error: Symbol '{symbol}' not in automaton alphabet.")
+                continue
+
+            current_state = next_state(current_state, symbol, automaton['transitions'], automaton.get('settings', []))
+            print(current_state)
+
+            if current_state == "Hang":
+                break
+        except EOFError:
+            print("\nSimulation ended.")
+            break
+
+    accepted = current_state in automaton['accept_states']
+    print(f"Final state: {current_state}")
+    print(f"Accepted: {accepted}")

@@ -34,6 +34,10 @@ def main():
         # Process the parsed file into proper data
         output_data = dfa_process.process_data(parsed_data)
 
+        if args.interactive:
+            dfa_logic.simulate_interactive(output_data)
+            return
+
         if not args.input_list_file:
         # Simulate the automaton with the input string
             result = dfa_logic.simulate(
