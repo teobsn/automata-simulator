@@ -41,13 +41,13 @@
 \clearpage
 
 \section{Introduction}
-The Automaton Specification Language (ASL) is a domain-specific language designed to define finite automata for simulation. It supports both Deterministic Finite Automata (DFA) and Non-deterministic Finite Automata (NFA).
+The Automaton Specification Language (ASL) is a domain-specific language designed to define finite automata for simulation. It supports Deterministic Finite Automata (DFA), Non-deterministic Finite Automata (NFA), and Pushdown Automata (PDA).
 
 \clearpage
 \section{File Structure}
 An ASL file is divided into sections, each denoted by a header in square brackets. Sections can appear in any order, though the following order is conventional:
 \begin{enumerate}
-    \item \texttt{[alphabet]}
+    \item \texttt{[alphabet]} (DFA/NFA) or \texttt{[alphabet\_states]} and \texttt{[alphabet\_stack]} (PDA)
     \item \texttt{[states]}
     \item \texttt{[initial\_state]}
     \item \texttt{[accept\_states]}
@@ -59,7 +59,15 @@ An ASL file is divided into sections, each denoted by a header in square bracket
 \section{Sections}
 
 \subsection{Alphabet}
-The \texttt{[alphabet]} section defines the set of symbols accepted by the automaton. Symbols are space-separated and can span multiple lines.
+For DFA and NFA, the \texttt{[alphabet]} section defines the set of symbols accepted by the automaton. 
+
+For PDA, two sections are required:
+\begin{itemize}
+    \item \texttt{[alphabet\_states]}: The set of symbols that can appear in the input string.
+    \item \texttt{[alphabet\_stack]}: The set of symbols that can be pushed onto or popped from the stack.
+\end{itemize}
+
+Symbols are space-separated and can span multiple lines.
 
 \subsection{States}
 The \texttt{[states]} section lists all possible states in the automaton. Like the alphabet, states are space-separated.
@@ -80,11 +88,14 @@ The \texttt{[accept\_states]} section lists the states that lead to an 'Accepted
 The \texttt{[transitions]} section defines the state transition function.
 
 \subsubsection{Wildcards}
-The asterisk \texttt{*} can be used as a wildcard for input symbols, representing all symbols in the defined alphabet.
+For DFA and NFA, the asterisk \texttt{*} can be used as a wildcard for input symbols, representing all symbols in the defined alphabet.
 \begin{lstlisting}
 q0, * -> q1 # Transition to q1 on any symbol from the alphabet
 \end{lstlisting}
 In DFAs, a specific transition defined for a symbol will take precedence over a wildcard transition if it appears later in the file.
+
+\subsubsection{Epsilon Transitions}
+The ampersand \texttt{\&} represents an epsilon transition, which occurs without consuming any input symbol. This is supported in NFA and PDA.
 
 \subsection{Settings}
 The \texttt{[settings]} section allows for optional behavioral modifications of the automaton. Settings are listed line-by-line or space-separated.
@@ -119,10 +130,20 @@ q0, a -> q1, q2
 q0, (a, b) -> q1
 \end{lstlisting}
 
-\textbf{Wildcard Transition:}
+\textbf{Epsilon Transition:}
 \begin{lstlisting}
-q0, * -> q1
+q0, & -> q1
 \end{lstlisting}
+
+\subsection{PDA Transitions}
+Pushdown Automata transitions include stack operations:
+\begin{lstlisting}
+source_state, input_symbol, stack_pop -> next_state, stack_push
+\end{lstlisting}
+\begin{itemize}
+    \item \texttt{stack\_pop}: The symbol that must be at the top of the stack to take this transition. Use \texttt{\&} to pop nothing.
+    \item \texttt{stack\_push}: The symbol(s) to push onto the stack. Use \texttt{\&} to push nothing. Multiple symbols can be pushed (space-separated).
+\end{itemize}
 
 \clearpage
 \section{Lexical Rules}
