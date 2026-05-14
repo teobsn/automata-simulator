@@ -8,7 +8,7 @@ def parse_args(args):
     import argparse
 
     parser = argparse.ArgumentParser(description="Simulate a finite automaton based on input data.")
-    parser.add_argument('automaton_type',   type=str,                             help='Type of automaton to simulate. Currently only "DFA" is supported')
+    parser.add_argument('automaton_type',   type=str,                             help='Type of automaton to simulate (DFA, NFA, PDA)')
     parser.add_argument('automaton_data',   type=check_path,                      help='Path to the automaton data file')
     parser.add_argument('input_string',     type=str, nargs='?', default=None,    help='Input string to process with the automaton')
     
