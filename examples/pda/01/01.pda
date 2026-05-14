@@ -1,0 +1,33 @@
+[alphabet_states]
+0 1
+
+[alphabet_stack]
+0 $
+
+[states]
+q_start q0 q1 q_accept
+
+[initial_state]
+q_start
+
+[accept_states]
+q_accept
+
+[transitions]
+# Initialize stack with $
+q_start, &, & -> q0, $
+
+# Push 0s onto stack
+q0, 0, & -> q0, 0
+
+# Transition to q1 on first 1, popping a 0
+q0, 1, 0 -> q1, &
+
+# Pop 0s for each 1
+q1, 1, 0 -> q1, &
+
+# Accept if stack only has $ left
+q1, &, $ -> q_accept, &
+
+# Handle empty string case (n=0)
+q0, &, $ -> q_accept, &
