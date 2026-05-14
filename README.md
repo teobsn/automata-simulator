@@ -1,10 +1,11 @@
 # Automaton Emulator
 
-A Python-based emulator for Deterministic Finite Automata (DFA) and Non-deterministic Finite Automata (NFA).
+A Python-based emulator for Deterministic Finite Automata (DFA), Non-deterministic Finite Automata (NFA), and Pushdown Automata (PDA).
 
 ## Features
 
-- **DFA and NFA Simulation**: Support for both types of finite automata.
+- **DFA, NFA, and PDA Simulation**: Support for three types of automata.
+- **Interactive Mode**: Step-by-step simulation for DFA.
 - **Batch Processing**: Run multiple input strings against an automaton using a list file.
 - **Custom Specification Language**: Easy-to-read format for defining automata.
 - **Flexible Output**: Results can be printed to the console or saved to a file.
@@ -25,17 +26,19 @@ chmod +x simulator.sh
 ./simulator.sh <TYPE> <FILE> [INPUT_STRING] [OPTIONS]
 ```
 
-- `<TYPE>`: `DFA` or `NFA`.
+- `<TYPE>`: `DFA`, `NFA`, or `PDA`.
 - `<FILE>`: Path to the automaton definition file.
 - `[INPUT_STRING]`: (Optional) The string to test.
+- `--interactive`, `-i`: Enable interactive mode (DFA only).
 - `--input-list-file <PATH>`: Path to a file containing multiple test strings (one per line).
 - `--output-file <PATH>`: Path to save results.
-- `--write-intermediary`: Write intermediary steps to the output (currently implemented for DFA).
+- `--write-intermediary`: Write intermediary steps to the output (DFA only).
 
 ### Example
 
 ```bash
 ./simulator.sh DFA examples/dfa/c2/1/1.dfa 10101
+./simulator.sh PDA examples/pda/01/01.pda 0011
 ```
 
 ## Automaton Definition Format
@@ -44,7 +47,9 @@ Automata are defined in text files with specific sections enclosed in brackets.
 
 ### Sections
 
-- `[alphabet]`: Space-separated list of symbols.
+- `[alphabet]`: (DFA/NFA) Space-separated list of symbols.
+- `[alphabet_states]`: (PDA) Input symbols.
+- `[alphabet_stack]`: (PDA) Stack symbols.
 - `[states]`: Space-separated list of states.
 - `[initial_state]`: The starting state.
 - `[accept_states]`: Space-separated list of accepting (final) states.
@@ -53,36 +58,25 @@ Automata are defined in text files with specific sections enclosed in brackets.
 ### Transition Syntax
 
 #### DFA
-Each transition must be on its own line:
 `source_state, symbol -> next_state`
 
 #### NFA
-NFAs support more flexible transition syntax:
-- `source_state, symbol -> next_state`
+- `source_state, symbol -> next_state1, next_state2`
+- `source_state, & -> next_state` (Epsilon transition)
 - `source_state, (symbol1, symbol2) -> next_state` (Multiple symbols)
-- `source_state, symbol -> next_state1, next_state2` (Non-determinism)
+
+#### PDA
+`source_state, input_symbol, stack_pop -> next_state, stack_push`
+- Use `&` for epsilon (no input consumed, or no push/pop).
 
 ### Comments
 Use `#` for comments.
 
-```ini
-[alphabet]
-0 1
-
-[states]
-q0 q1
-
-[initial_state]
-q0
-
-[accept_states]
-q1
-
-[transitions]
-q0, 1 -> q1 # Transition to q1 on input 1
-q1, 0 -> q1
-```
-
 ## Documentation
 
 Detailed technical specification for the automaton definition language can be found in `doc/language/specification.tex`.
+
+To regenerate the PDF documentation from the LaTeX source, run:
+```bash
+./generate_docs.sh
+```
