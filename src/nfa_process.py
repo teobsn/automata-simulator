@@ -6,7 +6,7 @@ def section_initialize(data, section_name):
     # Check for duplicate sections
     if section_name in data:
         raise ValueError(
-            f"Parser: Duplicate section '{section_name}' found in input file."
+            f"NFA Parser: Duplicate section '{section_name}' found in input file."
         )
 
     if section_name in ["alphabet", "states", "accept_states"]:
@@ -18,7 +18,7 @@ def section_initialize(data, section_name):
     elif section_name == "settings":
         data[section_name] = []
     else:
-        raise ValueError(f"Parser: Unknown section '{section_name}' in input file.")
+        raise ValueError(f"NFA Parser: Unknown section '{section_name}' in input file.")
 
 
 def transition_add(data, source_state, input_symbols, next_states):
@@ -44,7 +44,7 @@ def transition_process_line(line):
 
     for sep in ["->"]:
         if sep not in line:
-            raise ValueError(f"Parser: Invalid transition format in line: '{line}'")
+            raise ValueError(f"NFA Parser: Invalid transition format in line: '{line}'")
 
     # Split the line into components
     combo, next_states_text = line.split("->")

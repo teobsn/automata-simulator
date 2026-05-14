@@ -9,7 +9,7 @@ def next_states(state, symbol, transitions, settings=[]):
 
     return "Hang"
 
-def epsilon_closure(state, transitions, visited=None):
+def epsilon_transition_closure(state, transitions, visited=None):
     """
     Finds all states reachable from the given state using only epsilon (&) transitions.
     """
@@ -24,7 +24,7 @@ def epsilon_closure(state, transitions, visited=None):
     
     if state in transitions and '&' in transitions[state]:
         for next_st in transitions[state]['&']:
-            closure.update(epsilon_closure(next_st, transitions, visited))
+            closure.update(epsilon_transition_closure(next_st, transitions, visited))
             
     return closure
 
@@ -61,7 +61,7 @@ def simulate_next(automaton, state, input_string, index, write_intermediary):
     # At any point, we can take epsilon transitions (&)
     # To avoid infinite loops, we only check epsilon closure once per symbol consumption
     # This might prove to be a limitation in regards to some NFAs :(
-    possible_states = epsilon_closure(state, automaton['transitions'])
+    possible_states = epsilon_transition_closure(state, automaton['transitions'])
 
     # Base case: if we've reached the end of the input string
     if index == len(input_string):
