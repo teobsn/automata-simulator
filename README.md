@@ -100,5 +100,5 @@ Detailed technical specification for the automaton definition language can be fo
 
 To regenerate the PDF documentation from the LaTeX source, run:
 ```bash
-./generate_docs.sh
+./dev/generate_docs.sh
 ```
