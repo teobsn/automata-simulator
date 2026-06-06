@@ -1,38 +1,40 @@
 #!/usr/bin/env python3
 
-
-# Standard libraries
-# import os
-# from pprint import pprint
 import sys
+import os
 
-# Project modules
-import parser
+# Add the current directory to sys.path to allow absolute imports of packages
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Core modules
+from core import parser, output, cli
 
 # DFA
-import dfa_process
-import dfa_logic
-import dfa_output
+from dfa import process as dfa_process
+from dfa import logic as dfa_logic
+from dfa import output as dfa_output
 
 # NFA
-import nfa_process
-import nfa_logic
-import nfa_output
+from nfa import process as nfa_process
+from nfa import logic as nfa_logic
+from nfa import output as nfa_output
 
 # PDA
-import pda_process
-import pda_logic
-import pda_output
+from pda import process as pda_process
+from pda import logic as pda_logic
+from pda import output as pda_output
 
-import output
-import cli
+# CFG
+from cfg import process as cfg_process
+from cfg import logic as cfg_logic
+from cfg import output as cfg_output
 
 
 def main():
     # Parse command-line arguments
     args = cli.parse_args(sys.argv[1:])
 
-    # Parse the file to get the automaton data
+    # Parse the file to get the automaton/grammar data
     parsed_data = parser.parse(args.automaton_data)
 
     if args.automaton_type in ["DFA", "dfa"]:
@@ -44,7 +46,7 @@ def main():
             return
 
         if not args.input_list_file:
-        # Simulate the automaton with the input string
+            # Simulate the automaton with the input string
             result = dfa_logic.simulate(
                 output_data, args.input_string, write_intermediary=args.write_intermediary
             )
@@ -67,6 +69,7 @@ def main():
                 output.write_output(
                     dfa_output.interpret_result(result), args.output_file, append=True
                 )
+                
     elif args.automaton_type in ["NFA", "nfa"]:
         output_data = nfa_process.process_data(parsed_data)
 
@@ -75,13 +78,11 @@ def main():
                 output_data, args.input_string
             )
 
-            # Write the result to the output file or print it
             output.write_output(nfa_output.interpret_result(result), args.output_file)
         else:
             with open(args.input_list_file, "r") as f:
                 input_list = f.read().splitlines()
 
-            # Create a blank file first, as we are going to append to it 
             if args.output_file is not None:
                 output.blank_file(args.output_file)
 
@@ -92,6 +93,7 @@ def main():
                 output.write_output(
                     nfa_output.interpret_result(result), args.output_file, append=True
                 )
+                
     elif args.automaton_type in ["PDA", "pda"]:
         output_data = pda_process.process_data(parsed_data)
 
@@ -115,12 +117,26 @@ def main():
                 output.write_output(
                     pda_output.interpret_result(result), args.output_file, append=True
                 )
+                
+    elif args.automaton_type in ["CFG", "cfg"]:
+        # Process the grammar file
+        output_data = cfg_process.process_data(parsed_data)
+        
+        if args.verify:
+            # Verification mode: check if input string is accepted
+            result = cfg_logic.simulate(output_data, args.input_string)
+        else:
+            # Generation mode (Default): produce strings from grammar
+            derivations = cfg_logic.generate(output_data, count=args.count)
+            result = {'derivations': derivations}
+            
+        output.write_output(cfg_output.interpret_result(result), args.output_file)
+        
     else:
         raise ValueError(
-            f"Automaton type '{args.automaton_type}' is not supported. Currently only 'DFA', 'NFA' and 'PDA' are supported."
+            f"Automaton type '{args.automaton_type}' is not supported. Currently only 'DFA', 'NFA', 'PDA' and 'CFG' are supported."
         )
 
 
 if __name__ == "__main__":
     main()
-

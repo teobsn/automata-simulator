@@ -41,156 +41,225 @@
 \clearpage
 
 \section{Introduction}
-The Automaton Specification Language (ASL) is a domain-specific language designed to define finite automata for simulation. It supports Deterministic Finite Automata (DFA), Non-deterministic Finite Automata (NFA), and Pushdown Automata (PDA).
-
-\clearpage
-\section{File Structure}
-An ASL file is divided into sections, each denoted by a header in square brackets. Sections can appear in any order, though the following order is conventional:
-\begin{enumerate}
-    \item \texttt{[alphabet]} (DFA/NFA) or \texttt{[alphabet\_states]} and \texttt{[alphabet\_stack]} (PDA)
-    \item \texttt{[states]}
-    \item \texttt{[initial\_state]}
-    \item \texttt{[accept\_states]}
-    \item \texttt{[transitions]}
-    \item \texttt{[settings]} (optional)
-\end{enumerate}
-
-\clearpage
-\section{Sections}
-
-\subsection{Alphabet}
-For DFA and NFA, the \texttt{[alphabet]} section defines the set of symbols accepted by the automaton. 
-
-For PDA, two sections are required:
+The Automaton Specification Language (ASL) is a domain-specific language designed to define finite automata, pushdown automata, and context-free grammars for simulation. It currently supports four types:
 \begin{itemize}
-    \item \texttt{[alphabet\_states]}: The set of symbols that can appear in the input string.
-    \item \texttt{[alphabet\_stack]}: The set of symbols that can be pushed onto or popped from the stack.
+    \item \textbf{DFA}: Deterministic Finite Automata
+    \item \textbf{NFA}: Non-deterministic Finite Automata
+    \item \textbf{PDA}: Pushdown Automata
+    \item \textbf{CFG}: Context-Free Grammars
 \end{itemize}
 
-Symbols are space-separated and can span multiple lines.
+\section{General Syntax}
+All ASL files share a common structure based on sections and lexical rules.
 
-\subsection{States}
-The \texttt{[states]} section lists all possible states in the automaton. Like the alphabet, states are space-separated.
+\subsection{File Structure}
+An ASL file is divided into sections, each denoted by a header in square brackets (e.g., \texttt{[alphabet]}). Sections can appear in any order.
 
-\subsubsection{State Ranges}
-To define a sequence of states with a common prefix and a numerical range, you can use the range syntax: \texttt{prefix[start-end]}.
+\subsection{Lexical Rules}
+\begin{itemize}
+    \item \textbf{Comments}: Any text following a \texttt{\#} symbol on a line is ignored.
+    \item \textbf{Whitespace}: Leading and trailing whitespace on lines is ignored. Empty lines are ignored.
+    \item \textbf{Case Sensitivity}: Section headers are case-insensitive (\texttt{[ALPHABET]} is the same as \texttt{[alphabet]}).
+\end{itemize}
+
+\subsection{State Ranges}
+In sections defining states (like \texttt{[states]} or \texttt{[accept\_states]}), you can use range syntax to define multiple states at once: \texttt{prefix[start-end]}.
 \begin{lstlisting}
-q[0-15] # Expands to q0 q1 q2 ... q15
+q[0-5] # Expands to q0 q1 q2 q3 q4 q5
 \end{lstlisting}
 
-\subsection{Initial State}
-The \texttt{[initial\_state]} section must contain exactly one state from the defined states list. This represents the starting point of the simulation.
-
-\subsection{Accept States}
-The \texttt{[accept\_states]} section lists the states that lead to an 'Accepted' result if the simulation ends in one of them. State ranges are also supported here.
-
-\subsection{Transitions}
-The \texttt{[transitions]} section defines the state transition function.
-
-\subsubsection{Wildcards}
-For DFA and NFA, the asterisk \texttt{*} can be used as a wildcard for input symbols, representing all symbols in the defined alphabet.
-\begin{lstlisting}
-q0, * -> q1 # Transition to q1 on any symbol from the alphabet
-\end{lstlisting}
-In DFAs, a specific transition defined for a symbol will take precedence over a wildcard transition if it appears later in the file.
-
-\subsubsection{Epsilon Transitions}
-The ampersand \texttt{\&} represents an epsilon transition, which occurs without consuming any input symbol. This is supported in NFA and PDA.
-
-\subsection{Settings}
-The \texttt{[settings]} section allows for optional behavioral modifications of the automaton. Settings are listed line-by-line or space-separated.
-
-\subsubsection{RemainInCurrentStateOnUndefinedTransition}
-When this setting is enabled, the automaton will not 'Hang' if it encounters a symbol for which no transition is defined for the current state. Instead, it will remain in its current state and continue processing the rest of the input string. This is particularly useful for building text-based games or parsers where some inputs should simply be ignored or keep the state unchanged.
+\subsection{Special Symbols}
+\begin{itemize}
+    \item \texttt{*}: Wildcard representing all symbols in the defined alphabet.
+    \item \texttt{\&}: Epsilon symbol, representing an empty transition (no input consumed).
+\end{itemize}
 
 \clearpage
-\section{Transition Syntax}
+\section{Deterministic Finite Automata (DFA)}
+DFAs are the simplest form of automata, where each state has exactly one transition for each input symbol.
 
-\subsection{DFA Transitions}
-For Deterministic Finite Automata, each transition must follow the strict format:
+\subsection{Required Sections}
+\begin{itemize}
+    \item \texttt{[alphabet]}: Space-separated list of accepted symbols.
+    \item \texttt{[states]}: List of all possible states.
+    \item \texttt{[initial\_state]}: The starting state (exactly one).
+    \item \texttt{[accept\_states]}: States that result in an 'Accepted' status.
+    \item \texttt{[transitions]}: Rules for moving between states.
+\end{itemize}
+
+\subsection{DFA Transition Syntax}
+Each transition must follow the format:
 \begin{lstlisting}
 source_state, symbol -> next_state
 \end{lstlisting}
 
-\subsection{NFA Transitions}
-Non-deterministic Finite Automata support additional syntax for flexibility:
+\subsection{DFA Settings}
+Optional behaviors can be enabled in the \texttt{[settings]} section:
+\begin{itemize}
+    \item \texttt{RemainInCurrentStateOnUndefinedTransition}: If enabled, the automaton stays in its current state instead of hanging when a symbol has no defined transition.
+\end{itemize}
 
-\textbf{Single Transition:}
-\begin{lstlisting}
-q0, a -> q1
-\end{lstlisting}
+\clearpage
+\section{Non-deterministic Finite Automata (NFA)}
+NFAs allow for multiple possible next states for a given input symbol and support epsilon transitions.
 
-\textbf{Multiple Next States:}
-\begin{lstlisting}
-q0, a -> q1, q2
-\end{lstlisting}
+\subsection{Required Sections}
+NFAs use the same sections as DFAs (\texttt{[alphabet]}, \texttt{[states]}, etc.).
 
-\textbf{Multiple Input Symbols:}
-\begin{lstlisting}
-q0, (a, b) -> q1
-\end{lstlisting}
+\subsection{NFA Transition Syntax}
+NFAs support flexible syntax to handle non-determinism:
+\begin{itemize}
+    \item \textbf{Multiple Targets}: \texttt{q0, a -> q1, q2}
+    \item \textbf{Multiple Symbols}: \texttt{q0, (a, b) -> q1}
+    \item \textbf{Epsilon Transition}: \texttt{q0, \& -> q1}
+\end{itemize}
 
-\textbf{Epsilon Transition:}
-\begin{lstlisting}
-q0, & -> q1
-\end{lstlisting}
+\clearpage
+\section{Pushdown Automata (PDA)}
+PDAs extend NFAs by adding a stack, allowing them to recognize context-free languages.
 
-\subsection{PDA Transitions}
-Pushdown Automata transitions include stack operations:
+\subsection{PDA Specific Sections}
+PDAs require slightly different alphabet definitions:
+\begin{itemize}
+    \item \texttt{[alphabet\_states]}: Symbols that can appear in the input string.
+    \item \texttt{[alphabet\_stack]}: Symbols that can be pushed onto the stack.
+\end{itemize}
+
+\subsection{PDA Transition Syntax}
+Transitions include stack operations:
 \begin{lstlisting}
 source_state, input_symbol, stack_pop -> next_state, stack_push
 \end{lstlisting}
+
 \begin{itemize}
-    \item \texttt{stack\_pop}: The symbol that must be at the top of the stack to take this transition. Use \texttt{\&} to pop nothing.
-    \item \texttt{stack\_push}: The symbol(s) to push onto the stack. Use \texttt{\&} to push nothing. Multiple symbols can be pushed (space-separated).
+    \item \texttt{stack\_pop}: The symbol required at the top of the stack. Use \texttt{\&} to pop nothing.
+    \item \texttt{stack\_push}: Symbol(s) to push onto the stack. Use \texttt{\&} to push nothing. Multiple symbols can be pushed (space-separated, pushed in reverse order).
 \end{itemize}
 
 \clearpage
-\section{Lexical Rules}
+\section{Context-Free Grammars (CFG)}
+CFGs provide a way to generate strings of a language using recursive production rules.
+
+\subsection{Required Sections}
 \begin{itemize}
-    \item \textbf{Comments:} Any text following a \texttt{\#} symbol on a line is ignored.
-    \item \textbf{Whitespace:} Leading and trailing whitespace on lines is ignored. Empty lines are ignored.
-    \item \textbf{Case Sensitivity:} Section headers are case-insensitive (\texttt{[ALPHABET]} is the same as \texttt{[alphabet]}).
+    \item \texttt{[variables]}: Space-separated list of non-terminal symbols.
+    \item \texttt{[terminals]}: Space-separated list of terminal symbols.
+    \item \texttt{[start\_variable]}: The variable where derivations begin.
+    \item \texttt{[rules]}: Derivation rules (productions).
 \end{itemize}
 
-\clearpage
-\section{Example}
-\begin{lstlisting}[language=bash, caption=Example DFA file]
-[alphabet]
-a b
+\subsection{CFG Rule Syntax}
+Rules follow the format:
+\begin{lstlisting}
+Variable -> expansion1 | expansion2 | ...
+\end{lstlisting}
+Each expansion consists of space-separated variables and terminals. Use \texttt{\&} for the empty string (epsilon).
 
-[states]
-s0 s1
+\subsection{Implementation Details}
+The emulator uses a memoized top-down parsing algorithm to determine if a string belongs to the language generated by the CFG. It automatically handles non-terminal expansions and backtracking, but users should be aware that highly recursive grammars may impact performance.
+
+\clearpage
+\section{Applications and Use Cases}
+Automata theory provides the mathematical foundation for many areas of computer science. The following sections describe common applications for each automaton type, with references to the practical examples provided in the \texttt{examples/} directory.
+
+\subsection{Deterministic Finite Automata (DFA)}
+DFAs are widely used in applications where predictable, state-based behavior is required. Common use cases include:
+\begin{itemize}
+    \item \textbf{Lexical Analysis}: Compilers use DFAs to recognize tokens (keywords, identifiers) in source code.
+    \item \textbf{Protocol Verification}: Ensuring that network or hardware protocols follow a strict sequence of states.
+    \item \textbf{Game Logic}: Controlling state transitions in text-based adventures or simple NPC behaviors.
+\end{itemize}
+
+\subsubsection{Practical Example: String Filtering}
+The following DFA (found in \texttt{examples/dfa/only\_as/}) filters strings to ensure they consist only of the character 'a'. Any 'b' character leads to a permanent "trap" state (\texttt{q2}).
+\begin{lstlisting}[caption=DFA for matching only 'a's]
+[transitions]
+q1, a -> q1
+q1, b -> q2
+q2, a -> q2
+q2, b -> q2
 
 [initial_state]
-s0
+q1
 
 [accept_states]
-s1
-
-[transitions]
-s0, a -> s1
-s1, b -> s1
-s1, a -> s0
+q1
 \end{lstlisting}
 
-\begin{lstlisting}[language=bash, caption=Example NFA file with ranges and wildcards]
-[alphabet]
-0 1
-
-[states]
-q[0-2]
-
+\subsubsection{Practical Example: Adventure Game}
+The emulator's interactive mode can be used to simulate a text-based adventure game (\texttt{examples/dfa/adventure\_game\_basic/}). By enabling \texttt{RemainInCurrentStateOnUndefinedTransition}, the game becomes more robust to invalid user commands.
+\begin{lstlisting}[caption=DFA for a simple adventure game]
 [initial_state]
-q0
-
-[accept_states]
-q2
+Entrance
 
 [transitions]
-q0, * -> q0
-q0, 1 -> q1
-q1, (0, 1) -> q2
+Entrance, W -> Hallway
+Garden, N -> Heaven
+Garden, S -> Hell
+Hallway, W -> Library
+Hallway, N -> Kitchen
+Kitchen, W -> DiningRoom
+DiningRoom, W -> Garden
+
+[settings]
+RemainInCurrentStateOnUndefinedTransition
+\end{lstlisting}
+
+\subsection{Non-deterministic Finite Automata (NFA)}
+NFAs are often used for pattern matching and text processing where multiple possibilities must be explored:
+\begin{itemize}
+    \item \textbf{Regular Expressions}: Many regex engines convert patterns into NFAs (and subsequently DFAs) for efficient searching.
+    \item \textbf{Pattern Recognition}: Finding specific subsequences within larger data streams using non-deterministic branching.
+\end{itemize}
+
+\subsubsection{Practical Example: Suffix Matching}
+This NFA (\texttt{examples/nfa/ends\_with\_aa\_or\_bb/}) demonstrates non-determinism by staying in the start state (\texttt{q0}) while simultaneously branching out to check if the current character starts the suffix "aa" or "bb".
+\begin{lstlisting}[caption=NFA matching strings ending in 'aa' or 'bb']
+[transitions]
+q0, a -> q0, q1
+q0, b -> q0, q3
+q1, a -> q2
+q3, b -> q4
+
+[accept_states]
+q2 q4
+\end{lstlisting}
+
+\subsection{Pushdown Automata (PDA)}
+PDAs are essential for recognizing context-free languages, which require memory beyond simple states:
+\begin{itemize}
+    \item \textbf{Parsing}: Compilers use PDAs (often implemented as LL or LR parsers) to process nested structures like parentheses or mathematical expressions.
+    \item \textbf{Markup Languages}: Verifying that tags in HTML or XML are correctly balanced and nested.
+\end{itemize}
+
+\subsubsection{Practical Example: Balanced Sequences}
+The classic language $L = \{0^n 1^n \mid n \ge 0\}$ (\texttt{examples/pda/zero\_n\_one\_n/}) requires a stack to "remember" how many 0s were seen so they can be matched with an equal number of 1s. This is the foundation of parenthesis matching in programming languages.
+\begin{lstlisting}[caption={PDA for matching balanced 0s and 1s}]
+[transitions]
+# Push 0s onto stack
+q0, 0, & -> q0, 0
+
+# Pop a 0 for every 1
+q0, 1, 0 -> q1, &
+q1, 1, 0 -> q1, &
+
+# Accept only if stack is empty (except for marker $)
+q1, &, $ -> q_accept, &
+\end{lstlisting}
+
+\subsection{Context-Free Grammars (CFG)}
+CFGs are used to describe the syntax of programming languages and natural languages.
+\begin{itemize}
+    \item \textbf{Compiler Design}: Defining the syntax of high-level languages (C, Java, Python).
+    \item \textbf{Linguistics}: Modeling the structural rules of human languages.
+    \item \textbf{Data Transformation}: Defining formats for data serialization like JSON or YAML.
+\end{itemize}
+
+\subsubsection{Practical Example: Nested Patterns}
+The grammar for the language $L = \{a^n b^n \mid n \ge 1\}$ (\texttt{examples/cfg/an\_bn/}) uses recursion to ensure that every 'a' is matched by a 'b'.
+\begin{lstlisting}[caption={CFG for $a^n b^n$}]
+[rules]
+S -> a S b | a b
 \end{lstlisting}
 
 \end{document}
