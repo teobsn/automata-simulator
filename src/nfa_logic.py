@@ -28,7 +28,7 @@ def epsilon_transition_closure(state, transitions, visited=None):
             
     return closure
 
-def simulate(automaton, input_string, write_intermediary=False, show_input=False):
+def simulate(automaton, input_string, show_input=False):
     # Initialize result data
     results = {}
 
@@ -42,20 +42,20 @@ def simulate(automaton, input_string, write_intermediary=False, show_input=False
         results['input_string'] = input_string
 
     # Start simulation
-    results['branch'] = simulate_start(automaton, input_string, write_intermediary)
+    results['branch'] = simulate_start(automaton, input_string)
 
     return results
 
-def simulate_start(automaton, input_string, write_intermediary=False):
+def simulate_start(automaton, input_string):
     # Initialize the current state to the start state
     current_state = automaton['initial_state']
 
     # Start recursive simulation
-    branch = simulate_next(automaton, current_state, input_string, 0, write_intermediary)
+    branch = simulate_next(automaton, current_state, input_string, 0)
 
     return branch
 
-def simulate_next(automaton, state, input_string, index, write_intermediary):
+def simulate_next(automaton, state, input_string, index):
     import concurrent.futures
 
     # At any point, we can take epsilon transitions (&)
@@ -85,7 +85,7 @@ def simulate_next(automaton, state, input_string, index, write_intermediary):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         # Map each next state to a future task
         futures = [
-            executor.submit(simulate_next, automaton, next_st, input_string, index + 1, write_intermediary)
+            executor.submit(simulate_next, automaton, next_st, input_string, index + 1)
             for next_st in next_state_list
         ]
 

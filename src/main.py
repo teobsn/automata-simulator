@@ -72,7 +72,7 @@ def main():
 
         if not args.input_list_file:
             result = nfa_logic.simulate(
-                output_data, args.input_string, write_intermediary=args.write_intermediary
+                output_data, args.input_string
             )
 
             # Write the result to the output file or print it
@@ -87,7 +87,7 @@ def main():
 
             for input_str in input_list:
                 result = nfa_logic.simulate(
-                    output_data, input_str, write_intermediary=args.write_intermediary, show_input=True
+                    output_data, input_str, show_input=True
                 )
                 output.write_output(
                     nfa_output.interpret_result(result), args.output_file, append=True
@@ -97,7 +97,7 @@ def main():
 
         if not args.input_list_file:
             result = pda_logic.simulate(
-                output_data, args.input_string, write_intermediary=args.write_intermediary
+                output_data, args.input_string
             )
 
             output.write_output(pda_output.interpret_result(result), args.output_file)
@@ -110,7 +110,7 @@ def main():
 
             for input_str in input_list:
                 result = pda_logic.simulate(
-                    output_data, input_str, write_intermediary=args.write_intermediary, show_input=True
+                    output_data, input_str, show_input=True
                 )
                 output.write_output(
                     pda_output.interpret_result(result), args.output_file, append=True

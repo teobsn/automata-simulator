@@ -57,7 +57,7 @@ def epsilon_transition_closure(state, stack, transitions, visited=None):
                     
     return results
 
-def simulate(automaton, input_string, write_intermediary=False, show_input=False):
+def simulate(automaton, input_string, show_input=False):
     """
     Main entry point for PDA simulation.
     """
@@ -74,11 +74,11 @@ def simulate(automaton, input_string, write_intermediary=False, show_input=False
         results['input_string'] = input_string
 
     # Start the actual simulation logic
-    results['accepted'] = simulate_start(automaton, input_string, write_intermediary)
+    results['accepted'] = simulate_start(automaton, input_string)
 
     return results
 
-def simulate_start(automaton, input_string, write_intermediary=False):
+def simulate_start(automaton, input_string):
     """
     Prepares the initial state and stack before starting the recursive simulation.
     """
@@ -87,11 +87,11 @@ def simulate_start(automaton, input_string, write_intermediary=False):
     current_stack = []
 
     # Start the multi-threaded recursive simulation
-    branch = simulate_next(automaton, current_state, current_stack, input_string, 0, write_intermediary)
+    branch = simulate_next(automaton, current_state, current_stack, input_string, 0)
 
     return branch
 
-def simulate_next(automaton, state, stack, input_string, index, write_intermediary):
+def simulate_next(automaton, state, stack, input_string, index):
     """
     Recursive function that explores all possible PDA computation branches.
     """
@@ -141,7 +141,7 @@ def simulate_next(automaton, state, stack, input_string, index, write_intermedia
     with concurrent.futures.ThreadPoolExecutor() as executor:
         # Map each next configuration to a future task
         futures = [
-            executor.submit(simulate_next, automaton, next_st, next_stack, input_string, index + 1, write_intermediary)
+            executor.submit(simulate_next, automaton, next_st, next_stack, input_string, index + 1)
             for next_st, next_stack in next_configs
         ]
 
