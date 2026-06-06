@@ -41,6 +41,28 @@ chmod +x simulator.sh
 ./simulator.sh PDA examples/pda/zero_n_one_n/zero_n_one_n.pda 0011
 ```
 
+## Transformation Tools
+
+The repository also includes file-to-file helpers under `tools/` that use the same ASL format as the simulator.
+
+### DFA / NFA Conversion
+
+```bash
+python3 tools/convert_automaton.py --to dfa input.nfa output.dfa
+python3 tools/convert_automaton.py --to nfa input.dfa output.nfa
+```
+
+- `--to dfa` applies NFA determinization using subset construction.
+- `--to nfa` rewrites a DFA as an equivalent NFA-compatible ASL file.
+
+### DFA Minimisation
+
+```bash
+python3 tools/minimise_dfa.py input.dfa output.min.dfa
+```
+
+- The output is a minimized DFA written back to the same project format.
+
 ## Automaton Definition Format
 
 Automata are defined in text files with specific sections enclosed in brackets.
