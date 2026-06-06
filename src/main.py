@@ -7,136 +7,64 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Core modules
-from core import parser, output, cli
+from core import parser, output, cli, runner
 
-# DFA
-from dfa import process as dfa_process
-from dfa import logic as dfa_logic
-from dfa import output as dfa_output
+# Automaton type components mapping
+import dfa.process as dfa_process, dfa.logic as dfa_logic, dfa.output as dfa_output
+import nfa.process as nfa_process, nfa.logic as nfa_logic, nfa.output as nfa_output
+import pda.process as pda_process, pda.logic as pda_logic, pda.output as pda_output
+import cfg.process as cfg_process, cfg.logic as cfg_logic, cfg.output as cfg_output
 
-# NFA
-from nfa import process as nfa_process
-from nfa import logic as nfa_logic
-from nfa import output as nfa_output
-
-# PDA
-from pda import process as pda_process
-from pda import logic as pda_logic
-from pda import output as pda_output
-
-# CFG
-from cfg import process as cfg_process
-from cfg import logic as cfg_logic
-from cfg import output as cfg_output
-
+HANDLERS = {
+    "DFA": (dfa_process, dfa_logic, dfa_output),
+    "NFA": (nfa_process, nfa_logic, nfa_output),
+    "PDA": (pda_process, pda_logic, pda_output),
+    "CFG": (cfg_process, cfg_logic, cfg_output),
+}
 
 def main():
     # Parse command-line arguments
     args = cli.parse_args(sys.argv[1:])
+    automaton_type = args.automaton_type.upper()
 
-    # Parse the file to get the automaton/grammar data
+    if automaton_type not in HANDLERS:
+        supported = ", ".join(HANDLERS.keys())
+        raise ValueError(f"Automaton type '{args.automaton_type}' not supported. Supported: {supported}")
+
+    # Get respective modules for the selected type
+    proc, logic, out_fmt = HANDLERS[automaton_type]
+
+    # Parse the raw file data
     parsed_data = parser.parse(args.automaton_data)
+    
+    # Process data into structured format
+    automaton_data = proc.process_data(parsed_data)
 
-    if args.automaton_type in ["DFA", "dfa"]:
-        # Process the parsed file into proper data
-        output_data = dfa_process.process_data(parsed_data)
+    # Handle Special Case: DFA Interactive Mode
+    if automaton_type == "DFA" and args.interactive:
+        logic.simulate_interactive(automaton_data)
+        return
 
-        if args.interactive:
-            dfa_logic.simulate_interactive(output_data)
-            return
+    # Handle Special Case: CFG Generation Mode
+    if automaton_type == "CFG" and not args.verify:
+        derivations = logic.generate(automaton_data, count=args.count)
+        result = {'derivations': derivations}
+        output.write_output(out_fmt.interpret_result(result), args.output_file)
+        return
 
-        if not args.input_list_file:
-            # Simulate the automaton with the input string
-            result = dfa_logic.simulate(
-                output_data, args.input_string, write_intermediary=args.write_intermediary
-            )
+    # Standard Case: Simulation/Verification (Single or Batch)
+    # This covers DFA (normal), NFA, PDA, and CFG (verify)
+    extra_args = {}
+    if automaton_type == "DFA":
+        extra_args['write_intermediary'] = args.write_intermediary
 
-            # Write the result to the output file or print it
-            output.write_output(dfa_output.interpret_result(result), args.output_file)
-        else:
-            with open(args.input_list_file, "r") as f:
-                input_list = f.read().splitlines()
-
-            # Create a blank file first, as we are going to append to it 
-            if args.output_file is not None:
-                output.blank_file(args.output_file)
-
-            for input_str in input_list:
-                result = dfa_logic.simulate(
-                    output_data, input_str, write_intermediary=args.write_intermediary, show_input=True
-                )
-
-                output.write_output(
-                    dfa_output.interpret_result(result), args.output_file, append=True
-                )
-                
-    elif args.automaton_type in ["NFA", "nfa"]:
-        output_data = nfa_process.process_data(parsed_data)
-
-        if not args.input_list_file:
-            result = nfa_logic.simulate(
-                output_data, args.input_string
-            )
-
-            output.write_output(nfa_output.interpret_result(result), args.output_file)
-        else:
-            with open(args.input_list_file, "r") as f:
-                input_list = f.read().splitlines()
-
-            if args.output_file is not None:
-                output.blank_file(args.output_file)
-
-            for input_str in input_list:
-                result = nfa_logic.simulate(
-                    output_data, input_str, show_input=True
-                )
-                output.write_output(
-                    nfa_output.interpret_result(result), args.output_file, append=True
-                )
-                
-    elif args.automaton_type in ["PDA", "pda"]:
-        output_data = pda_process.process_data(parsed_data)
-
-        if not args.input_list_file:
-            result = pda_logic.simulate(
-                output_data, args.input_string
-            )
-
-            output.write_output(pda_output.interpret_result(result), args.output_file)
-        else:
-            with open(args.input_list_file, "r") as f:
-                input_list = f.read().splitlines()
-
-            if args.output_file is not None:
-                output.blank_file(args.output_file)
-
-            for input_str in input_list:
-                result = pda_logic.simulate(
-                    output_data, input_str, show_input=True
-                )
-                output.write_output(
-                    pda_output.interpret_result(result), args.output_file, append=True
-                )
-                
-    elif args.automaton_type in ["CFG", "cfg"]:
-        # Process the grammar file
-        output_data = cfg_process.process_data(parsed_data)
-        
-        if args.verify:
-            # Verification mode: check if input string is accepted
-            result = cfg_logic.simulate(output_data, args.input_string)
-        else:
-            # Generation mode (Default): produce strings from grammar
-            derivations = cfg_logic.generate(output_data, count=args.count)
-            result = {'derivations': derivations}
-            
-        output.write_output(cfg_output.interpret_result(result), args.output_file)
-        
-    else:
-        raise ValueError(
-            f"Automaton type '{args.automaton_type}' is not supported. Currently only 'DFA', 'NFA', 'PDA' and 'CFG' are supported."
-        )
-
+    runner.run_simulation(
+        logic.simulate, 
+        out_fmt.interpret_result, 
+        automaton_data, 
+        args, 
+        **extra_args
+    )
 
 if __name__ == "__main__":
     main()
