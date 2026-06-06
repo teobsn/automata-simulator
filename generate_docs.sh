@@ -14,7 +14,7 @@ if [ $? -eq 0 ]; then
     echo "Documentation generated successfully: $DOC_DIR/$PDF_FILE"
     
     # Cleanup auxiliary files
-    rm -f "$DOC_DIR"/*.aux "$DOC_DIR"/*.log "$DOC_DIR"/*.toc "$DOC_DIR"/*.out
+    rm -f "$DOC_DIR"/*.aux "$DOC_DIR"/*.fdb_latexmk "$DOC_DIR"/*.fls "$DOC_DIR"/*.log "$DOC_DIR"/*.out "$DOC_DIR"/*.toc
     echo "Cleanup complete."
 else
     echo "Error: Failed to generate documentation."
