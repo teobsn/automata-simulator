@@ -1,3 +1,5 @@
+# This PDA recognizes the language L = { 0^n 1^n | n >= 0 }
+
 [alphabet_states]
 0 1
 

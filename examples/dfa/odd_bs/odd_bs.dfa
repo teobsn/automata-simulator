@@ -1,4 +1,4 @@
-# W contine un nr. impar de b
+# Accepts strings with an odd number of 'b's
 
 [transitions]
 q1, b -> q2

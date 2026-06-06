@@ -1,3 +1,5 @@
+# Accepts strings ending in 'aa' or 'bb'
+
 [alphabet]
 a b
 

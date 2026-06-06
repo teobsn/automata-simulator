@@ -1,3 +1,5 @@
+# Accepts the string 'a' using an epsilon transition
+
 [alphabet]
 a
 

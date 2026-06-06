@@ -1,3 +1,5 @@
+# Accepts strings where the second symbol from the end is '1'
+
 [alphabet]
 0 1
 

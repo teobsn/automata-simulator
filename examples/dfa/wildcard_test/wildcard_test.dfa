@@ -1,3 +1,5 @@
+# Accepts strings consisting of zero or more 'b's followed by either 'a' or 'c'
+
 [alphabet]
 a b c
 

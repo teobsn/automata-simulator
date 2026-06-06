@@ -1,3 +1,5 @@
+# Text-based game simulation with rooms, a key, and a potion
+
 [alphabet]
 # North, South, East, West
 N S E W

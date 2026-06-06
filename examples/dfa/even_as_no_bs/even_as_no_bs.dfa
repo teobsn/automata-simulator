@@ -1,4 +1,4 @@
-# L = {a^2n / n >= 1}
+# Accepts strings consisting of an even number of 'a's and no 'b's
 
 [transitions]
 0, a -> 2

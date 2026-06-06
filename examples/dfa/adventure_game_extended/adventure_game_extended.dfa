@@ -1,3 +1,5 @@
+# Text-based game simulation with rooms and a potion
+
 [alphabet]
 # North, South, East, West
 N S E W
@@ -55,7 +57,8 @@ Kitchen_withPotion, W -> DiningRoom_withPotion
 DiningRoom_withPotion, W -> Garden_withPotion
 Garden_withPotion, S -> Heaven
 
-# Transition between potion and no potion variant; to-do: be able to drop potion anywhere
+# Transition between potion and no potion variant;  to-do: be able to drop potion anywhere
+#                                                   This would be best implemented with a PDA.
 Library, P -> Library_withPotion
 Library_withPotion, D -> Library
 

@@ -37,8 +37,8 @@ chmod +x simulator.sh
 ### Example
 
 ```bash
-./simulator.sh DFA examples/dfa/c2/1/1.dfa 10101
-./simulator.sh PDA examples/pda/01/01.pda 0011
+./simulator.sh DFA examples/dfa/even_zeros_after_last_one/even_zeros_after_last_one.dfa 10100
+./simulator.sh PDA examples/pda/zero_n_one_n/zero_n_one_n.pda 0011
 ```
 
 ## Automaton Definition Format

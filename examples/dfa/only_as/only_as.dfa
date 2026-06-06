@@ -1,4 +1,4 @@
-# W contine doar a-uri
+# Accepts strings consisting only of 'a's
 
 [transitions]
 q1, a -> q1

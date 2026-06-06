@@ -1,3 +1,5 @@
+# DFA with four states and multiple transitions
+
 [transitions]
 q1, a -> q2
 q1, b -> q3

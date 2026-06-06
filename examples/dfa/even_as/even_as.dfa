@@ -1,4 +1,4 @@
-# W contine un nr. par de a
+# Accepts strings with an even number of 'a's
 
 [transitions]
 q1, a -> q2

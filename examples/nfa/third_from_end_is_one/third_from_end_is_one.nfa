@@ -1,3 +1,5 @@
+# Accepts strings where the third symbol from the end is '1'
+
 [transitions]
 q1, (0, 1) -> q1
 q1, 1 -> q2
