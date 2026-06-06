@@ -282,4 +282,11 @@ The \texttt{tools/minimise\_dfa.py} script applies DFA minimisation and writes t
 python3 tools/minimise_dfa.py input.dfa output.min.dfa
 \end{lstlisting}
 
+\subsection{Automaton Visualization}
+The \texttt{tools/visualize\_automaton.py} script renders a diagram-only SVG preview of a DFA, NFA, or PDA using Graphviz \texttt{dot}. The output uses black transitions and labels on a white background for a clean academic presentation. It opens the preview in the default viewer, with platform-specific fallbacks on macOS, Linux, and Windows, and does not require a user-specified output file.
+\begin{lstlisting}
+python3 tools/visualize_automaton.py examples/dfa/contains_11/contains_11.dfa DFA
+python3 tools/visualize_automaton.py examples/pda/zero_n_one_n/zero_n_one_n.pda PDA
+\end{lstlisting}
+
 \end{document}

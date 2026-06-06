@@ -13,10 +13,18 @@ A Python-based emulator for Deterministic Finite Automata (DFA), Non-determinist
 
 ## Installation
 
-Ensure you have Python 3 installed. Clone the repository and use the provided shell script or run `src/main.py` directly.
+Ensure you have Python 3 installed. Clone the repository and use the appropriate launcher for your platform, or run `src/main.py` directly.
+
+Linux/macOS:
 
 ```bash
 chmod +x simulator.sh
+```
+
+Windows:
+
+```bat
+simulator.bat
 ```
 
 ## Usage
@@ -66,6 +74,19 @@ python3 tools/minimise_dfa.py input.dfa output.min.dfa
 ```
 
 - The output is a minimized DFA written back to the same project format.
+
+### Visualization
+
+```bash
+python3 tools/visualize_automaton.py examples/dfa/contains_11/contains_11.dfa DFA
+python3 tools/visualize_automaton.py examples/pda/zero_n_one_n/zero_n_one_n.pda PDA
+```
+
+- This renders a diagram-only SVG using Graphviz `dot` and opens it in the default viewer.
+- Transitions and labels are drawn in black for maximum contrast on a white background.
+- If the default viewer is unavailable, the script falls back to `open` on macOS, `xdg-open`/`gio open` on Linux, and `start` on Windows.
+- Use `--no-open` if you want to generate the preview without launching a viewer.
+- Supported inputs are `DFA`, `NFA`, and `PDA`.
 
 ## Definition Format
 
