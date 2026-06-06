@@ -23,4 +23,7 @@ def parse_args(args):
     if not parsed_args.interactive and parsed_args.input_string is None and parsed_args.input_list_file is None:
         parser.error("At least one of 'input_string', '--input-list-file', or '--interactive' must be provided.")
 
+    if parsed_args.write_intermediary and parsed_args.automaton_type.upper() != 'DFA':
+        parser.error("--write-intermediary is only supported for DFA.")
+
     return parsed_args
