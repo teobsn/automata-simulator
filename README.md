@@ -149,6 +149,8 @@ Use `#` for comments.
 
 Detailed technical specification for the automaton definition language and other project details can be found in `doc/language/specification.tex`.
 
+For convenience, the generated PDF is already included in `doc/language/specification.pdf`.
+
 To regenerate the PDF documentation from the LaTeX source, run:
 ```bash
 ./dev/generate_docs.sh
