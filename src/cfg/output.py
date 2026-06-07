@@ -31,4 +31,8 @@ def interpret_result(result):
             
             output += f"\nResult: \"{result_str}\"\n\n"
 
+        if result.get("truncated"):
+            output += "[warning]\n"
+            output += "One or more derivations were truncated by the safety limit.\n\n"
+
     return output

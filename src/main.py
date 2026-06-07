@@ -47,8 +47,11 @@ def main():
 
     # Handle Special Case: CFG Generation Mode
     if automaton_type == "CFG" and not args.verify:
-        derivations = logic.generate(automaton_data, count=args.count)
-        result = {'derivations': derivations}
+        result = logic.generate(
+            automaton_data,
+            count=args.count,
+            max_expansions=args.cfg_max_expansions,
+        )
         output.write_output(out_fmt.interpret_result(result), args.output_file)
         return
 

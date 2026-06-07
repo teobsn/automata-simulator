@@ -18,6 +18,7 @@ def parse_args(args):
     parser.add_argument('-i', '--interactive',  action='store_true',              help='Enable interactive mode for input symbols')
     parser.add_argument('--verify',             action='store_true',              help='Verify if input_string belongs to the CFG')
     parser.add_argument('--count',              type=int, default=1,              help='Number of strings to generate (for CFG default mode)')
+    parser.add_argument('--cfg-max-expansions', type=int, default=100,           help='Maximum expansion steps per generated CFG derivation; use 0 to disable the safety limit.')
 
     parsed_args = parser.parse_args(args)
 
