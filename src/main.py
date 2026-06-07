@@ -50,7 +50,7 @@ def main():
         result = logic.generate(
             automaton_data,
             count=args.count,
-            max_expansions=args.cfg_max_expansions,
+            max_expansions=100 if args.cfg_max_expansions is None else args.cfg_max_expansions,
         )
         output.write_output(out_fmt.interpret_result(result), args.output_file)
         return
