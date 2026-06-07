@@ -81,6 +81,40 @@ def expand_range(token):
     return [token]
 
 
+def validate_structure(output_data):
+    declared_states = set(output_data["states"])
+    alphabet = set(output_data["alphabet"])
+
+    if output_data["initial_state"] not in declared_states:
+        raise ValueError(
+            f"NFA Processor: Initial state '{output_data['initial_state']}' is not declared in [states]."
+        )
+
+    undefined_accept_states = [state for state in output_data["accept_states"] if state not in declared_states]
+    if undefined_accept_states:
+        raise ValueError(
+            "NFA Processor: Accept state(s) not declared in [states]: "
+            + ", ".join(undefined_accept_states)
+        )
+
+    for source_state, transitions in output_data["transitions"].items():
+        if source_state not in declared_states:
+            raise ValueError(
+                f"NFA Processor: Transition source state '{source_state}' is not declared in [states]."
+            )
+
+        for input_symbol, next_states in transitions.items():
+            if input_symbol != "&" and input_symbol not in alphabet:
+                raise ValueError(
+                    f"NFA Processor: Transition symbol '{input_symbol}' is not declared in [alphabet]."
+                )
+            for next_state in next_states:
+                if next_state not in declared_states:
+                    raise ValueError(
+                        f"NFA Processor: Transition target state '{next_state}' is not declared in [states]."
+                    )
+
+
 def process_data(input_data):
     """
     Processes the raw parsed data from the input file into a structured dictionary
@@ -137,6 +171,22 @@ def process_data(input_data):
     # Supports '*' as a wildcard in the symbol list, expanding to all alphabet symbols.
     for line in parser.get_section_from_data(input_data, "transitions"):
         source_state, input_symbols, next_states = transition_process_line(line)
+
+        if source_state not in output_data["states"]:
+            raise ValueError(
+                f"NFA Processor: Transition source state '{source_state}' is not declared in [states]."
+            )
+        for input_symbol in input_symbols:
+            if input_symbol != "*" and input_symbol not in output_data["alphabet"] and input_symbol != "&":
+                raise ValueError(
+                    f"NFA Processor: Transition symbol '{input_symbol}' is not declared in [alphabet]."
+                )
+        for next_state in next_states:
+            if next_state not in output_data["states"]:
+                raise ValueError(
+                    f"NFA Processor: Transition target state '{next_state}' is not declared in [states]."
+                )
+
         transition_add(output_data, source_state, input_symbols, next_states)
 
     # Settings section
@@ -146,5 +196,6 @@ def process_data(input_data):
     else:
         output_data["settings"] = []
 
-    return output_data
+    validate_structure(output_data)
 
+    return output_data

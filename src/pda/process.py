@@ -76,6 +76,54 @@ def expand_range(token):
     return [token]
 
 
+def validate_structure(output_data):
+    declared_states = set(output_data["states"])
+    input_alphabet = set(output_data["alphabet_states"])
+    stack_alphabet = set(output_data["alphabet_stack"])
+
+    if output_data["initial_state"] not in declared_states:
+        raise ValueError(
+            f"PDA Processor: Initial state '{output_data['initial_state']}' is not declared in [states]."
+        )
+
+    undefined_accept_states = [state for state in output_data["accept_states"] if state not in declared_states]
+    if undefined_accept_states:
+        raise ValueError(
+            "PDA Processor: Accept state(s) not declared in [states]: "
+            + ", ".join(undefined_accept_states)
+        )
+
+    for source_state, by_symbol in output_data["transitions"].items():
+        if source_state not in declared_states:
+            raise ValueError(
+                f"PDA Processor: Transition source state '{source_state}' is not declared in [states]."
+            )
+
+        for input_symbol, by_stack in by_symbol.items():
+            if input_symbol != "&" and input_symbol not in input_alphabet:
+                raise ValueError(
+                    f"PDA Processor: Transition input symbol '{input_symbol}' is not declared in [alphabet_states]."
+                )
+
+            for stack_pop, transitions in by_stack.items():
+                if stack_pop != "&" and stack_pop not in stack_alphabet:
+                    raise ValueError(
+                        f"PDA Processor: Transition stack symbol '{stack_pop}' is not declared in [alphabet_stack]."
+                    )
+
+                for next_state, stack_push in transitions:
+                    if next_state not in declared_states:
+                        raise ValueError(
+                            f"PDA Processor: Transition target state '{next_state}' is not declared in [states]."
+                        )
+                    if stack_push != "&":
+                        for symbol in stack_push.split():
+                            if symbol not in stack_alphabet:
+                                raise ValueError(
+                                    f"PDA Processor: Transition stack push symbol '{symbol}' is not declared in [alphabet_stack]."
+                                )
+
+
 def process_data(input_data):
     """
     Processes the raw parsed data from the input file into a structured dictionary
@@ -129,6 +177,31 @@ def process_data(input_data):
     # Transitions
     for line in parser.get_section_from_data(input_data, "transitions"):
         source_state, input_symbols, stack_pop, next_state, stack_push = transition_process_line(line)
+
+        if source_state not in output_data["states"]:
+            raise ValueError(
+                f"PDA Processor: Transition source state '{source_state}' is not declared in [states]."
+            )
+        for input_symbol in input_symbols:
+            if input_symbol != "&" and input_symbol not in output_data["alphabet_states"]:
+                raise ValueError(
+                    f"PDA Processor: Transition input symbol '{input_symbol}' is not declared in [alphabet_states]."
+                )
+        if stack_pop != "&" and stack_pop not in output_data["alphabet_stack"]:
+            raise ValueError(
+                f"PDA Processor: Transition stack symbol '{stack_pop}' is not declared in [alphabet_stack]."
+            )
+        if next_state not in output_data["states"]:
+            raise ValueError(
+                f"PDA Processor: Transition target state '{next_state}' is not declared in [states]."
+            )
+        if stack_push != "&":
+            for symbol in stack_push.split():
+                if symbol not in output_data["alphabet_stack"]:
+                    raise ValueError(
+                        f"PDA Processor: Transition stack push symbol '{symbol}' is not declared in [alphabet_stack]."
+                    )
+
         transition_add(output_data, source_state, input_symbols, stack_pop, next_state, stack_push)
 
     # Settings
@@ -138,6 +211,7 @@ def process_data(input_data):
     else:
         output_data["settings"] = []
 
-    return output_data
+    validate_structure(output_data)
 
+    return output_data
 

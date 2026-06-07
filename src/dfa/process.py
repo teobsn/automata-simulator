@@ -61,6 +61,39 @@ def expand_range(token):
     return [token]
 
 
+def validate_structure(output_data):
+    declared_states = set(output_data["states"])
+    alphabet = set(output_data["alphabet"])
+
+    if output_data["initial_state"] not in declared_states:
+        raise ValueError(
+            f"DFA Processor: Initial state '{output_data['initial_state']}' is not declared in [states]."
+        )
+
+    undefined_accept_states = [state for state in output_data["accept_states"] if state not in declared_states]
+    if undefined_accept_states:
+        raise ValueError(
+            "DFA Processor: Accept state(s) not declared in [states]: "
+            + ", ".join(undefined_accept_states)
+        )
+
+    for source_state, transitions in output_data["transitions"].items():
+        if source_state not in declared_states:
+            raise ValueError(
+                f"DFA Processor: Transition source state '{source_state}' is not declared in [states]."
+            )
+
+        for input_symbol, next_state in transitions.items():
+            if input_symbol != "*" and input_symbol not in alphabet:
+                raise ValueError(
+                    f"DFA Processor: Transition symbol '{input_symbol}' is not declared in [alphabet]."
+                )
+            if next_state not in declared_states:
+                raise ValueError(
+                    f"DFA Processor: Transition target state '{next_state}' is not declared in [states]."
+                )
+
+
 def process_data(input_data):
     """
     Processes the raw parsed data from the input file into a structured dictionary
@@ -119,6 +152,19 @@ def process_data(input_data):
         # Format line and extract components
         source_state, input_symbol, next_state = transition_process_line(line)
 
+        if source_state not in output_data["states"]:
+            raise ValueError(
+                f"DFA Processor: Transition source state '{source_state}' is not declared in [states]."
+            )
+        if input_symbol != "*" and input_symbol not in output_data["alphabet"]:
+            raise ValueError(
+                f"DFA Processor: Transition symbol '{input_symbol}' is not declared in [alphabet]."
+            )
+        if next_state not in output_data["states"]:
+            raise ValueError(
+                f"DFA Processor: Transition target state '{next_state}' is not declared in [states]."
+            )
+
         # Add transition to data dictionary
         transition_add(output_data, source_state, input_symbol, next_state)
 
@@ -129,5 +175,6 @@ def process_data(input_data):
     else:
         output_data["settings"] = []
 
-    return output_data
+    validate_structure(output_data)
 
+    return output_data

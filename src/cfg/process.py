@@ -33,6 +33,11 @@ def rule_add(data, variable, expansion):
     
     # Tokenize the expansion string; white-space is used as the standard delimiter
     symbols = expansion.split()
+    for symbol in symbols:
+        if symbol != "&" and symbol not in data["variables"] and symbol not in data["terminals"]:
+            raise ValueError(
+                f"CFG Parser: Symbol '{symbol}' in rule expansion for '{variable}' is not declared in [variables] or [terminals]."
+            )
     if symbols not in data["rules"][variable]:
         data["rules"][variable].append(symbols)
 
