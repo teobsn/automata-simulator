@@ -1,4 +1,4 @@
-# Automaton Emulator
+# Automata Simulator
 
 A Python-based emulator for Deterministic Finite Automata (DFA), Non-deterministic Finite Automata (NFA), Pushdown Automata (PDA), and Context-Free Grammars (CFG).
 
