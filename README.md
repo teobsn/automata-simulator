@@ -1,5 +1,7 @@
 # Automata Simulator
 
+[![CI](https://github.com/teobsn/automaton_emulator/actions/workflows/ci.yml/badge.svg)](https://github.com/teobsn/automaton_emulator/actions/workflows/ci.yml)
+
 A Python-based simulator for Deterministic Finite Automata (DFA), Non-deterministic Finite Automata (NFA), Pushdown Automata (PDA), and Context-Free Grammars (CFG).
 
 ## Features
