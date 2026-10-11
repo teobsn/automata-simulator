@@ -110,7 +110,7 @@ def refine_partitions(states, accept_states, transitions, alphabet):
 
 def minimize(dfa_automaton):
     alphabet = unique_preserve_order(list(dfa_automaton["alphabet"]))
-    states, transitions, _ = build_total_transition_map(dfa_automaton)
+    states, transitions, sink_state = build_total_transition_map(dfa_automaton)
 
     reachable = reachable_states(
         dfa_automaton["initial_state"], states, transitions, alphabet
@@ -123,14 +123,21 @@ def minimize(dfa_automaton):
     reachable_transitions = {state: transitions[state] for state in reachable}
     partitions = refine_partitions(reachable, accept_states, reachable_transitions, alphabet)
 
+    # If a synthetic sink state was introduced to complete the transition map,
+    # remove it from the partitions and drop any partition that consisted solely of it.
+    if sink_state is not None:
+        filtered_partitions = []
+        for block in partitions:
+            real_members = [s for s in block if s != sink_state]
+            if real_members:
+                filtered_partitions.append(real_members)
+        partitions = filtered_partitions
+
     state_to_partition = {}
     for index, block in enumerate(partitions):
         for state in block:
             state_to_partition[state] = index
 
-    minimized_states = [f"M{i}" for i in range(len(partitions))]
-    minimized_transitions = {}
-    minimized_accept_states = []
     comments = [
         "Minimized DFA generated from the input automaton.",
         "Partition mapping:",
@@ -147,6 +154,8 @@ def minimize(dfa_automaton):
 
     minimized_states = [partition_name[index] for index in ordered_partition_indexes]
     ordered_partitions = [partitions[index] for index in ordered_partition_indexes]
+    minimized_transitions = {}
+    minimized_accept_states = []
 
     for index, block in zip(ordered_partition_indexes, ordered_partitions):
         name = partition_name[index]
@@ -157,6 +166,8 @@ def minimize(dfa_automaton):
         representative = block[0]
         for symbol in alphabet:
             target_state = transitions[representative][symbol]
+            if target_state == sink_state or target_state not in state_to_partition:
+                continue
             target_partition = state_to_partition[target_state]
             minimized_transitions[name][symbol] = partition_name[target_partition]
 
@@ -171,8 +182,9 @@ def minimize(dfa_automaton):
         "initial_state": "M0",
         "accept_states": minimized_accept_states,
         "transitions": minimized_transitions,
-        "settings": [],
+        "settings": dfa_automaton.get("settings", []),
     }, comments
+
 
 
 def parse_args():

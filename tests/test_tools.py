@@ -44,6 +44,20 @@ class TestTools(unittest.TestCase):
         self.assertTrue(dfa_logic.simulate(minimized, "0110")["accepted"])
         self.assertFalse(dfa_logic.simulate(minimized, "01")["accepted"])
 
+    def test_minimise_wildcard_no_synthetic_expansion(self):
+        dfa_path = os.path.join(self.examples_dir, "dfa", "wildcard_test", "wildcard_test.dfa")
+        parsed_dfa = dfa_process.process_data(parser.parse(dfa_path))
+        minimized, comments = minimise_dfa.minimize(parsed_dfa)
+
+        # Must not expand a 2-state DFA into 3 states
+        self.assertEqual(len(minimized["states"]), 2)
+        self.assertEqual(minimized["states"], ["M0", "M1"])
+        self.assertTrue(dfa_logic.simulate(minimized, "a")["accepted"])
+        self.assertTrue(dfa_logic.simulate(minimized, "c")["accepted"])
+        self.assertTrue(dfa_logic.simulate(minimized, "ba")["accepted"])
+        self.assertFalse(dfa_logic.simulate(minimized, "b")["accepted"])
+
+
     def test_visualize_dot_generation(self):
         dfa_path = os.path.join(self.examples_dir, "dfa", "contains_11", "contains_11.dfa")
         parsed_dfa = dfa_process.process_data(parser.parse(dfa_path))
