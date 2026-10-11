@@ -1,6 +1,7 @@
 # Automata Simulator
 
 [![CI](https://github.com/teobsn/automaton_emulator/actions/workflows/ci.yml/badge.svg)](https://github.com/teobsn/automaton_emulator/actions/workflows/ci.yml)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 A Python-based simulator for Deterministic Finite Automata (DFA), Non-deterministic Finite Automata (NFA), Pushdown Automata (PDA), and Context-Free Grammars (CFG).
 
@@ -200,3 +201,8 @@ To regenerate the PDF documentation from the LaTeX source, run:
 ```bash
 ./dev/generate_docs.sh
 ```
+
+## License
+
+This project is licensed under the terms of the [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE).
+

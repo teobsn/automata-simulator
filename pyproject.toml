@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "A fast, lightweight Python simulator and toolset for DFA, NFA, PDA, and CFG."
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = {text = "AGPL-3.0-or-later"}
 authors = [
     {name = "Automata Simulator Contributors"}
 ]
@@ -28,6 +28,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development :: Compilers",
 ]
