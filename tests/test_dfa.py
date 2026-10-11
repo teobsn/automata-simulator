@@ -58,6 +58,26 @@ class TestDFA(unittest.TestCase):
         with self.assertRaises(ValueError):
             dfa_logic.simulate(automaton, "102")
 
+    def test_parse_string(self):
+        raw_spec = """
+        [alphabet]
+        0 1
+        [states]
+        s0 s1
+        [initial_state]
+        s0
+        [accept_states]
+        s1
+        [transitions]
+        s0, 1 -> s1
+        """
+        parsed = parser.parse_string(raw_spec)
+        automaton = dfa_process.process_data(parsed)
+        self.assertIs(dfa_logic.simulate(automaton, "1")["accepted"], True)
+        self.assertIsNot(dfa_logic.simulate(automaton, "0")["accepted"], True)
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
