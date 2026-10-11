@@ -13,7 +13,23 @@ A Python-based simulator for Deterministic Finite Automata (DFA), Non-determinis
 
 ## Installation
 
-Ensure you have Python 3 installed. Clone the repository and use the appropriate launcher for your platform, or run `src/main.py` directly.
+Ensure you have Python 3.10+ installed.
+
+### Option 1: Install as a Package (Recommended)
+
+```bash
+pip install .
+```
+
+This installs the `automata-sim` command-line executable:
+
+```bash
+automata-sim DFA examples/dfa/contains_11/contains_11.dfa 11
+```
+
+### Option 2: Run via Shell Script or Directly
+
+Clone the repository and use the appropriate launcher for your platform:
 
 Linux/macOS:
 
@@ -26,6 +42,7 @@ Windows:
 ```bat
 simulator.bat
 ```
+
 
 ### Optional Dependencies
 

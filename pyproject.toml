@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "automata-simulator"
+version = "0.1.0"
+description = "A fast, lightweight Python simulator and toolset for DFA, NFA, PDA, and CFG."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Automata Simulator Contributors"}
+]
+keywords = [
+    "automata",
+    "formal-languages",
+    "dfa",
+    "nfa",
+    "pda",
+    "cfg",
+    "simulation",
+    "graphviz",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Compilers",
+]
+
+[project.scripts]
+automata-sim = "main:main"
+
+[tool.setuptools]
+py-modules = ["main"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.packages.find]
+where = ["src"]
