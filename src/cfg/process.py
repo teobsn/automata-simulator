@@ -20,12 +20,17 @@ def section_initialize(data, section_name):
     else:
         raise ValueError(f"CFG Parser: Unexpected section '{section_name}' encountered.")
 
-def rule_add(data, variable, expansion):
+def rule_add(data, variable, expansion, variables_set=None, terminals_set=None):
     """
     Appends a new derivation rule to the internal rule mapping.
     Validates that the non-terminal variable has been properly defined.
     """
-    if variable not in data["variables"]:
+    if variables_set is None:
+        variables_set = set(data["variables"])
+    if terminals_set is None:
+        terminals_set = set(data["terminals"])
+
+    if variable not in variables_set:
         raise ValueError(f"CFG Parser: Non-terminal '{variable}' is used in a rule but not defined in [variables].")
     
     if variable not in data["rules"]:
@@ -34,7 +39,7 @@ def rule_add(data, variable, expansion):
     # Tokenize the expansion string; white-space is used as the standard delimiter
     symbols = expansion.split()
     for symbol in symbols:
-        if symbol != "&" and symbol not in data["variables"] and symbol not in data["terminals"]:
+        if symbol != "&" and symbol not in variables_set and symbol not in terminals_set:
             raise ValueError(
                 f"CFG Parser: Symbol '{symbol}' in rule expansion for '{variable}' is not declared in [variables] or [terminals]."
             )
@@ -102,10 +107,13 @@ def process_data(input_data):
         
         output_data["start_variable"] = start_var
 
+    variables_set = set(output_data["variables"])
+    terminals_set = set(output_data["terminals"])
+
     # Parse and register all production rules
     for line in parser.get_section_from_data(input_data, "rules"):
         variable, expansions = rule_process_line(line)
         for expansion in expansions:
-            rule_add(output_data, variable, expansion)
+            rule_add(output_data, variable, expansion, variables_set, terminals_set)
 
     return output_data

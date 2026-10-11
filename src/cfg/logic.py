@@ -5,8 +5,9 @@ def simulate(grammar, input_string, show_input=False):
     results = {}
 
     # Validate that all input symbols are part of the grammar's terminals
+    terminals_set = set(grammar['terminals'])
     for symbol in input_string:
-        if symbol not in grammar['terminals']:
+        if symbol not in terminals_set:
             raise ValueError(f"Symbol '{symbol}' not in grammar terminals.")
 
     # Optionally include the input string in the returned results
@@ -29,6 +30,8 @@ def generate(grammar, count=1, max_expansions=100):
     if max_expansions is not None and max_expansions <= 0:
         max_expansions = None
 
+    variables_set = set(grammar['variables'])
+
     for _ in range(count):
         # Start with the start variable
         current_form = [grammar['start_variable']]
@@ -37,30 +40,23 @@ def generate(grammar, count=1, max_expansions=100):
         expansions = 0
         
         # While there are still non-terminals to expand
-        while any(sym in grammar['variables'] for sym in current_form) and (
-            max_expansions is None or expansions < max_expansions
-        ):
-            new_form = []
-            expanded_in_this_step = False
-            
-            # Leftmost derivation approach
-            for sym in current_form:
-                if sym in grammar['variables'] and not expanded_in_this_step:
-                    # Non-determinism: randomly choose one of the production rules
-                    expansion = random.choice(grammar['rules'][sym])
-                    
-                    if expansion != ['&']:
-                        new_form.extend(expansion)
-                    
-                    expanded_in_this_step = True
-                    expansions += 1
-                else:
-                    new_form.append(sym)
-            
-            current_form = new_form
+        while (max_expansions is None or expansions < max_expansions):
+            # Leftmost derivation: find the first non-terminal
+            var_idx = next((i for i, sym in enumerate(current_form) if sym in variables_set), None)
+            if var_idx is None:
+                break
+
+            sym = current_form[var_idx]
+            expansion = random.choice(grammar['rules'][sym])
+            if expansion == ['&']:
+                current_form = current_form[:var_idx] + current_form[var_idx + 1:]
+            else:
+                current_form = current_form[:var_idx] + expansion + current_form[var_idx + 1:]
+
+            expansions += 1
             steps.append(list(current_form))
 
-        if max_expansions is not None and any(sym in grammar['variables'] for sym in current_form):
+        if max_expansions is not None and any(sym in variables_set for sym in current_form):
             truncated = True
             
         all_derivations.append(steps)

@@ -169,20 +169,23 @@ def process_data(input_data):
     # Transitions section can only have one entry per line
     # Each line is parsed to extract (source_state, symbols, next_states).
     # Supports '*' as a wildcard in the symbol list, expanding to all alphabet symbols.
+    declared_states = set(output_data["states"])
+    alphabet_set = set(output_data["alphabet"])
+
     for line in parser.get_section_from_data(input_data, "transitions"):
         source_state, input_symbols, next_states = transition_process_line(line)
 
-        if source_state not in output_data["states"]:
+        if source_state not in declared_states:
             raise ValueError(
                 f"NFA Processor: Transition source state '{source_state}' is not declared in [states]."
             )
         for input_symbol in input_symbols:
-            if input_symbol != "*" and input_symbol not in output_data["alphabet"] and input_symbol != "&":
+            if input_symbol != "*" and input_symbol not in alphabet_set and input_symbol != "&":
                 raise ValueError(
                     f"NFA Processor: Transition symbol '{input_symbol}' is not declared in [alphabet]."
                 )
         for next_state in next_states:
-            if next_state not in output_data["states"]:
+            if next_state not in declared_states:
                 raise ValueError(
                     f"NFA Processor: Transition target state '{next_state}' is not declared in [states]."
                 )

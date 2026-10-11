@@ -14,6 +14,11 @@ def simulate(automaton, input_string, write_intermediary=False, show_input=False
     results = {}
     hang = False
 
+    alphabet_set = set(automaton['alphabet'])
+    accept_states_set = set(automaton['accept_states'])
+    settings_set = set(automaton.get('settings', []))
+    transitions = automaton['transitions']
+
     # Initialize the current state to the start state
     current_state = automaton['initial_state']
 
@@ -27,11 +32,11 @@ def simulate(automaton, input_string, write_intermediary=False, show_input=False
 
     # Process each symbol in the input string
     for symbol in input_string:
-        if symbol not in automaton['alphabet']:
+        if symbol not in alphabet_set:
             raise ValueError(f"Symbol '{symbol}' not in automaton alphabet.")
 
         # Update the current state based on the transitions
-        current_state = next_state(current_state, symbol, automaton['transitions'], automaton.get('settings', []))
+        current_state = next_state(current_state, symbol, transitions, settings_set)
         if current_state == "Hang":
             hang = True
             break
@@ -43,7 +48,7 @@ def simulate(automaton, input_string, write_intermediary=False, show_input=False
     # Check if the final state is an accepting state
     results['final_state'] = current_state
     if not hang:
-        results['accepted'] = current_state in automaton['accept_states']
+        results['accepted'] = current_state in accept_states_set
     else:
         results['accepted'] = 'Hang'
 
@@ -51,6 +56,10 @@ def simulate(automaton, input_string, write_intermediary=False, show_input=False
 
 def simulate_interactive(automaton):
     current_state = automaton['initial_state']
+    alphabet_set = set(automaton['alphabet'])
+    accept_states_set = set(automaton['accept_states'])
+    settings_set = set(automaton.get('settings', []))
+    transitions = automaton['transitions']
     print(f"Initial state: {current_state}")
 
     while True:
@@ -60,14 +69,14 @@ def simulate_interactive(automaton):
                 continue
 
             # Allow exiting with common keywords if they aren't part of the alphabet
-            if symbol.lower() in ["quit", "exit", "done"] and symbol not in automaton["alphabet"]:
+            if symbol.lower() in ["quit", "exit", "done"] and symbol not in alphabet_set:
                 break
 
-            if symbol not in automaton['alphabet']:
+            if symbol not in alphabet_set:
                 print(f"Error: Symbol '{symbol}' not in automaton alphabet.")
                 continue
 
-            current_state = next_state(current_state, symbol, automaton['transitions'], automaton.get('settings', []))
+            current_state = next_state(current_state, symbol, transitions, settings_set)
             print(current_state)
 
             if current_state == "Hang":
@@ -76,6 +85,6 @@ def simulate_interactive(automaton):
             print("\nSimulation ended.")
             break
 
-    accepted = current_state in automaton['accept_states']
+    accepted = current_state in accept_states_set
     print(f"Final state: {current_state}")
     print(f"Accepted: {accepted}")

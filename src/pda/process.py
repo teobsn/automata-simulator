@@ -175,29 +175,33 @@ def process_data(input_data):
         output_data["initial_state"] = line.strip()
 
     # Transitions
+    declared_states = set(output_data["states"])
+    input_alphabet = set(output_data["alphabet_states"])
+    stack_alphabet = set(output_data["alphabet_stack"])
+
     for line in parser.get_section_from_data(input_data, "transitions"):
         source_state, input_symbols, stack_pop, next_state, stack_push = transition_process_line(line)
 
-        if source_state not in output_data["states"]:
+        if source_state not in declared_states:
             raise ValueError(
                 f"PDA Processor: Transition source state '{source_state}' is not declared in [states]."
             )
         for input_symbol in input_symbols:
-            if input_symbol != "&" and input_symbol not in output_data["alphabet_states"]:
+            if input_symbol != "&" and input_symbol not in input_alphabet:
                 raise ValueError(
                     f"PDA Processor: Transition input symbol '{input_symbol}' is not declared in [alphabet_states]."
                 )
-        if stack_pop != "&" and stack_pop not in output_data["alphabet_stack"]:
+        if stack_pop != "&" and stack_pop not in stack_alphabet:
             raise ValueError(
                 f"PDA Processor: Transition stack symbol '{stack_pop}' is not declared in [alphabet_stack]."
             )
-        if next_state not in output_data["states"]:
+        if next_state not in declared_states:
             raise ValueError(
                 f"PDA Processor: Transition target state '{next_state}' is not declared in [states]."
             )
         if stack_push != "&":
             for symbol in stack_push.split():
-                if symbol not in output_data["alphabet_stack"]:
+                if symbol not in stack_alphabet:
                     raise ValueError(
                         f"PDA Processor: Transition stack push symbol '{symbol}' is not declared in [alphabet_stack]."
                     )
