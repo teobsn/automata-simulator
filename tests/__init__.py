@@ -1,0 +1,3 @@
+"""
+Automata simulator test suite.
+"""
