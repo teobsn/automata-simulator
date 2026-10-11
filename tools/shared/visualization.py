@@ -136,14 +136,27 @@ def render_svg(dot_source):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".svg") as svg_file:
         svg_path = Path(svg_file.name)
 
-    with open(svg_path, "wb") as handle:
-        subprocess.run(
-            ["dot", "-Tsvg"],
-            input=dot_source.encode("utf-8"),
-            stdout=handle,
-            check=True,
+    try:
+        with open(svg_path, "wb") as handle:
+            subprocess.run(
+                ["dot", "-Tsvg"],
+                input=dot_source.encode("utf-8"),
+                stdout=handle,
+                check=True,
+            )
+    except FileNotFoundError:
+        if svg_path.exists():
+            svg_path.unlink()
+        raise RuntimeError(
+            "Graphviz 'dot' command was not found. Please install Graphviz to generate diagrams."
         )
+    except Exception:
+        if svg_path.exists():
+            svg_path.unlink()
+        raise
+
     return svg_path
+
 
 
 def open_preview(svg_path):

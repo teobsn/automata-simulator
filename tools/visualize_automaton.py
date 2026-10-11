@@ -52,12 +52,20 @@ def main():
     else:
         raise ValueError(f"Unsupported automaton type: {args.automaton_type}")
 
-    svg_path = render_svg(dot)
+    try:
+        svg_path = render_svg(dot)
+    except RuntimeError as error:
+        print(f"Error: {error}")
+        return 1
+
     if not args.no_open:
         open_preview(svg_path)
     else:
         print(svg_path)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    sys.exit(main())
+
