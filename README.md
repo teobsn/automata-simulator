@@ -48,11 +48,19 @@ simulator.bat
 
 ### Optional Dependencies
 
-To render automaton diagrams using `tools/visualize_automaton.py`, ensure Graphviz is installed:
+- **Graphviz** (for diagram generation):
+  - Linux: `sudo apt install graphviz` (Debian/Ubuntu) or `sudo dnf install graphviz` (Fedora)
+  - macOS: `brew install graphviz`
+  - Windows: `winget install Graphviz.Graphviz`
+- **Streamlit** (for the web demo): `pip install streamlit`
 
-- **Linux**: `sudo apt install graphviz` (Debian/Ubuntu) or `sudo dnf install graphviz` (Fedora)
-- **macOS**: `brew install graphviz`
-- **Windows**: `winget install Graphviz.Graphviz`
+## Interactive Web Demo
+
+Launch the interactive browser UI to test automata and view diagrams live:
+
+```bash
+streamlit run app.py
+```
 
 ## Running Tests
 
@@ -61,6 +69,7 @@ Run the test suite using Python's built-in `unittest` runner:
 ```bash
 python3 -m unittest discover -v tests
 ```
+
 
 ## Usage
 
