@@ -14,48 +14,39 @@ def next_states(state, symbol, stack_top, transitions, settings=[]):
 
     return "Hang"
 
+from collections import deque
+
+
 def epsilon_transition_closure(state, stack, transitions, visited=None):
     """
     Finds all configurations (state, stack) reachable from the given configuration
-    using only epsilon (&) transitions. This allows the PDA to change states or 
-    modify the stack without consuming input symbols.
+    using only epsilon (&) transitions.
     """
-    if visited is None:
-        visited = set()
-    
-    # Configuration is (state, stack_as_tuple) to ensure hashability
-    config = (state, tuple(stack))
-    
-    # Base case for recursion: prevent infinite loops in epsilon cycles
-    if config in visited:
-        return set()
-    
-    visited.add(config)
-    results = {config}
-    
-    # Check if the current state has any epsilon transitions defined
-    if state in transitions and '&' in transitions[state]:
-        # A PDA can pop a specific symbol or '&' (popping nothing)
-        for pop_sym in transitions[state]['&']:
-            if pop_sym == '&' or (stack and stack[-1] == pop_sym):
-                for next_st, push_str in transitions[state]['&'][pop_sym]:
-                    # Create a new stack for the next configuration
-                    new_stack = list(stack)
-                    
-                    # Apply the pop operation
-                    if pop_sym != '&':
-                        new_stack.pop()
-                    
-                    # Apply the push operation
-                    if push_str != '&':
-                        # Multiple symbols are pushed in reverse order (standard PDA convention)
-                        for s in reversed(push_str.split()):
-                            new_stack.append(s)
-                    
-                    # Recursively find more epsilon-reachable configurations
-                    results.update(epsilon_transition_closure(next_st, new_stack, transitions, visited))
-                    
-    return results
+    initial_config = (state, tuple(stack))
+    closure = {initial_config}
+    stack_list = [initial_config]
+
+    while stack_list:
+        curr_state, curr_st = stack_list.pop()
+        if curr_state in transitions and '&' in transitions[curr_state]:
+            top_sym = curr_st[-1] if curr_st else None
+            pop_candidates = ('&', top_sym) if top_sym is not None else ('&',)
+            for pop_sym in pop_candidates:
+                if pop_sym in transitions[curr_state]['&']:
+                    for next_st, push_str in transitions[curr_state]['&'][pop_sym]:
+                        next_stack = list(curr_st)
+                        if pop_sym != '&':
+                            next_stack.pop()
+                        if push_str != '&':
+                            for s in reversed(push_str.split()):
+                                next_stack.append(s)
+                        next_cfg = (next_st, tuple(next_stack))
+                        if next_cfg not in closure:
+                            closure.add(next_cfg)
+                            stack_list.append(next_cfg)
+
+    return closure
+
 
 def simulate(automaton, input_string, show_input=False):
     """
@@ -65,8 +56,9 @@ def simulate(automaton, input_string, show_input=False):
     results = {}
 
     # Validate input against the defined alphabet (excluding &)
+    alphabet_set = set(automaton['alphabet_states'])
     for symbol in input_string:
-        if symbol not in automaton['alphabet_states'] and symbol != '&':
+        if symbol not in alphabet_set and symbol != '&':
             raise ValueError(f"Symbol '{symbol}' not in automaton alphabet.")
 
     # Store input string in results if required
@@ -78,78 +70,52 @@ def simulate(automaton, input_string, show_input=False):
 
     return results
 
+
 def simulate_start(automaton, input_string):
     """
-    Prepares the initial state and stack before starting the recursive simulation.
+    Simulates the PDA on input_string using iterative breadth-first search.
     """
-    # Initialize the current state to the start state and the stack as empty
-    current_state = automaton['initial_state']
-    current_stack = []
+    transitions = automaton['transitions']
+    accept_states = set(automaton['accept_states'])
+    input_len = len(input_string)
 
-    # Start the multi-threaded recursive simulation
-    branch = simulate_next(automaton, current_state, current_stack, input_string, 0)
+    queue = deque([(automaton['initial_state'], (), 0)])
+    visited = {(automaton['initial_state'], (), 0)}
 
-    return branch
+    while queue:
+        state, stack, index = queue.popleft()
 
-def simulate_next(automaton, state, stack, input_string, index):
-    """
-    Recursive function that explores all possible PDA computation branches.
-    """
-    import concurrent.futures
+        # Find all configurations reachable by epsilon transitions
+        eps_configs = epsilon_transition_closure(state, stack, transitions)
 
-    # Find all configurations reachable by epsilon transitions before consuming a symbol
-    possible_configs = epsilon_transition_closure(state, stack, automaton['transitions'])
-
-    # Base case - Check acceptance if we've reached the end of the input string
-    if index == len(input_string):
-        # The PDA accepts if any reachable epsilon-config is in an accepting state
-        return any(s in automaton['accept_states'] for s, st in possible_configs)
-
-    # Step 3: Consume the next symbol from the input string
-    symbol = input_string[index]
-    
-    # Collect all possible next configurations (state, stack) resulting from consuming the symbol
-    next_configs = []
-    for s, st in possible_configs:
-        stack_top = st[-1] if st else '&'
-        
-        # We need to try both:
-        # - Popping the top symbol of the stack
-        # - Popping nothing (&)
-        for pop_sym in ['&', stack_top]:
-            if s in automaton['transitions'] and symbol in automaton['transitions'][s]:
-                if pop_sym in automaton['transitions'][s][symbol]:
-                    for next_st, push_str in automaton['transitions'][s][symbol][pop_sym]:
-                        # Prepare the stack for the next state
-                        new_stack = list(st)
-                        if pop_sym != '&':
-                            new_stack.pop()
-                        
-                        # Handle pushing new symbols onto the stack
-                        if push_str != '&':
-                            for sym in reversed(push_str.split()):
-                                new_stack.append(sym)
-                                
-                        next_configs.append((next_st, new_stack))
-
-    # If no paths are possible for this symbol, this branch fails (Hang)
-    if not next_configs:
-        return False
-
-    # Explore all valid next configurations in parallel
-    # Using ThreadPoolExecutor to handle non-deterministic branching
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        # Map each next configuration to a future task
-        futures = [
-            executor.submit(simulate_next, automaton, next_st, next_stack, input_string, index + 1)
-            for next_st, next_stack in next_configs
-        ]
-
-        # As each thread completes, check if any of them found an accepting path
-        for future in concurrent.futures.as_completed(futures):
-            if future.result() is True:
-                # Short-circuit: if one branch succeeds, the entire PDA accepts
+        # Base case - Check acceptance if we've reached the end of the input string
+        if index == input_len:
+            if any(s in accept_states for s, _ in eps_configs):
                 return True
+            continue
 
-    # If all branches have been explored and none accepted
+        symbol = input_string[index]
+
+        for s, st in eps_configs:
+            stack_top = st[-1] if st else None
+            pop_options = ('&', stack_top) if stack_top is not None else ('&',)
+
+            if s in transitions and symbol in transitions[s]:
+                for pop_sym in pop_options:
+                    if pop_sym in transitions[s][symbol]:
+                        for next_st, push_str in transitions[s][symbol][pop_sym]:
+                            new_stack = list(st)
+                            if pop_sym != '&':
+                                new_stack.pop()
+
+                            if push_str != '&':
+                                for sym in reversed(push_str.split()):
+                                    new_stack.append(sym)
+
+                            next_item = (next_st, tuple(new_stack), index + 1)
+                            if next_item not in visited:
+                                visited.add(next_item)
+                                queue.append(next_item)
+
     return False
+
