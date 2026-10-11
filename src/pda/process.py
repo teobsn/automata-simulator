@@ -1,5 +1,4 @@
 from core import parser
-import re
 
 
 def section_initialize(data, section_name):
@@ -65,15 +64,7 @@ def transition_process_line(line):
     return source_state, input_symbols, stack_pop, next_state, stack_push
 
 
-def expand_range(token):
-    # Example: q[0-15] -> q0, q1, ..., q15
-    match = re.match(r"(.*)\[(\d+)-(\d+)\]", token)
-    if match:
-        prefix = match.group(1)
-        start = int(match.group(2))
-        end = int(match.group(3))
-        return [f"{prefix}{i}" for i in range(start, end + 1)]
-    return [token]
+expand_range = parser.expand_range
 
 
 def validate_structure(output_data):

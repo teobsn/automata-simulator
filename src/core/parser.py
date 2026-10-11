@@ -1,3 +1,6 @@
+import re
+
+
 def parse(input_file):
     # Data dictionary
     data = {}
@@ -31,6 +34,17 @@ def parse(input_file):
     return data
 
 
+def expand_range(token):
+    # Example: q[0-15] -> q0, q1, ..., q15
+    match = re.match(r"(.*)\[(\d+)-(\d+)\]", token)
+    if match:
+        prefix = match.group(1)
+        start = int(match.group(2))
+        end = int(match.group(3))
+        return [f"{prefix}{i}" for i in range(start, end + 1)]
+    return [token]
+
+
 def get_section_from_data(data, section_name):
     if section_name not in data:
         raise ValueError(f"Parser: Section '{section_name}' not found in input file.")
@@ -39,3 +53,4 @@ def get_section_from_data(data, section_name):
 
 def get_section_list(data):
     return list(data.keys())
+

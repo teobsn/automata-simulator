@@ -1,19 +1,3 @@
-# Find next states from transitions map
-def next_states(state, symbol, stack_top, transitions, settings=[]):
-    """
-    Looks up possible next states in the transitions table.
-    """
-    if state in transitions:
-        if symbol in transitions[state]:
-            if stack_top in transitions[state][symbol]:
-                return transitions[state][symbol][stack_top]
-
-    # Optional setting to handle cases where no transition is defined
-    if "RemainInCurrentStateOnUndefinedTransition" in settings:
-        return [(state, "&")] # Remain in state, push nothing
-
-    return "Hang"
-
 from collections import deque
 
 
