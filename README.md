@@ -27,7 +27,24 @@ Windows:
 simulator.bat
 ```
 
+### Optional Dependencies
+
+To render automaton diagrams using `tools/visualize_automaton.py`, ensure Graphviz is installed:
+
+- **Linux**: `sudo apt install graphviz` (Debian/Ubuntu) or `sudo dnf install graphviz` (Fedora)
+- **macOS**: `brew install graphviz`
+- **Windows**: `winget install Graphviz.Graphviz`
+
+## Running Tests
+
+Run the test suite using Python's built-in `unittest` runner:
+
+```bash
+python3 -m unittest discover -v tests
+```
+
 ## Usage
+
 
 ### Command Line Arguments
 
